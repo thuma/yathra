@@ -495,26 +495,16 @@
 			fromValue = _GET["from"];
 			toValue = _GET["to"];
 			
-			$.getJSON('prisAPI/stations/' + _GET["from"],
-                function(json) {  
-                    $("#from").val(json.name); 
-					fromString = json.name;
-					if(firstdone == true){
-						$("#searchbutton").click();
-					}   
-					firstdone = true;
-                } );
-            					
-        	$.getJSON('prisAPI/stations/' + _GET["to"],
-                function(json) {  
-                    $("#destination").val(json.name);  
-                    toString = json.name;
-                    if(firstdone == true){
-						$("#searchbutton").click();
-					}   
-					firstdone = true;
-                } );
-
+			for (var i = 0; i < allastationer.length; i++){
+				if(allastationer[i].value == _GET["from"]){
+					$("#from").val(allastationer[i].label);
+					fromString=allastationer[i].label;
+				}
+				if(allastationer[i].value == _GET["to"]){
+					$("#destination").val(allastationer[i].label);
+					toString = allastationer[i].label;
+				}
+			}
 		}
 		
 		 $(function() {
