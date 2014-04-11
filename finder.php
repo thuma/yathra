@@ -58,7 +58,7 @@ T   Train and local public transport. Express buses are not included in the sear
 B   Express bus and local public transport. Regional trains and speed trains are not included in the search.
 */
 '&arrival=false'.
-'&key=b4141ff657cfdd05df923ac21c057286');
+'&key=<ADD TRAFIK LAB KEY HERE>');
 /*
 '&mode1=true'. //Speed train. X2000 and Arlanda Express
 '&mode2=true'. //Train (except speed trains)
