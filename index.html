@@ -1,213 +1,534 @@
-<html>
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" manifest="offline.php"> <!--<![endif]-->
+
 <head>
-<title>Yathra - Reseplanerare med pris</title>
-<style>
-/*-----------------------------------*\
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width" />
+  
+  <title>Yathra: Tidtabell med priser för hela Sverige.</title>
+  
+  <link href='http://fonts.googleapis.com/css?family=Wellfleet' rel='stylesheet' type='text/css'>
 
-	Toast
-	A Simple CSS Framework
-	=================================
+  <link rel="stylesheet" href="css/normalize.css" />
+  
+  <link href="css/jayaga/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/foundation.css" />
+  
+  <link rel="stylesheet" href="css/styles.css" />
+  
+   <link rel="stylesheet" href="css/styleMore.css" />
 
-	Values you may want to change:
-	- .container { max-width:; }
-	- p { margin-bottom:; }
-	- html { font:; }
+   <link rel="apple-touch-icon" href="/img/touchandoroid.png">
 
-	Remember: no framework will be as
-	good as a custom built, per-
-	project	one. Toast and other
-	frameworks are best used for
-	rapid prototyping.
-
-\*-----------------------------------*/
-
-/*-----------------------------------*\
-	$RESET
-\*-----------------------------------*/
-
-* {
-	margin: 0;
-	padding: 0;
-	position: relative;
-	-webkit-box-sizing: border-box;
-	   -moz-box-sizing: border-box;
-	        box-sizing: border-box;
-}
-
-/*-----------------------------------*\
-	$GRID
-\*-----------------------------------*/
-
-.container {
-	/* Whatever you want. They’re your oats. */
-	max-width: 960px;
-	margin: 0 auto;
-	padding: 0 30px;
-	padding: 0 1.5rem;
-}
-
-.grid {
-	margin-left: -3%;
-	max-width: 105%;
-}
-
-.unit {
-	display: inline-block;
-	*display: inline;
-	*zoom: 1;
-	vertical-align: top;
-	margin-left: 3%;
-	margin-right: -.25em;
-	/* Clearfix */
-	overflow: hidden;
-	*overflow: visible;
-}
-
-	.unit.demo {
-		background-color: #fff8eb;
-		height: 48px;
-		height: 3rem;
-		margin-bottom: 24px;
-		margin-bottom: 1.5rem;
+	<link href="/img/touchandoroid.png" rel="apple-touch-icon-precomposed">
+  
+  <style>
+   .progress-label {
+		float: left;
+		margin-left: 45%;
+		margin-top: 5px;
+		font-weight: bold;
+		text-shadow: 1px 1px 0 #fff;
 	}
-
-.span-grid {
-	width: 97%;
-}
-
-.one-of-two { width: 47%; }
-
-.one-of-three { width: 30.36%; }
-.two-of-three { width: 63.666666666%; }
-
-.one-of-four { width: 22.05%; }
-.three-of-four { width: 72%; }
-
-.one-of-five { width: 17.07%; }
-.two-of-five { width: 37%; }
-.three-of-five { width: 57%; }
-.four-of-five { width: 77%; }
-
-@media screen and (max-width: 650px) {
-	.grid {
-		margin-left: 0;
-		max-width: none;
+	
+	.demoHeaders {
+		margin-top: 2em;
 	}
-
-	.unit {
-		width: auto;
-		margin-left: 0;
-		display: block;
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
 	}
-}
-
-/*-----------------------------------*\
-	$TYPE
-
-	Works off the assumption of a 1.5
-	line height @ 20px. Again, change
-	as necessary.
-\*-----------------------------------*/
-
-p, .p, ul, ol, hr, table, form, pre,
-h1, .alpha, h2, .beta {
-	margin-bottom: 30px;
-	margin-bottom: 1.5rem;
-}
-
-h1, .alpha {
-	font-size: 60px;
-	font-size: 3rem;
-	font-weight: 700;
-	line-height: 1;
-}
-
-h2, .beta {
-	font-size: 30px;
-	font-size: 1.5rem;
-	font-weight: 400;
-	line-height: 2;
-}
-
-h3, .gamma {
-	font-size: 20px;
-	font-size: 1rem;
-	font-weight: 700;
-}
-
-hr {
-	border: none;
-	border-bottom: 1px solid rgba(0,0,0,.1);
-	margin-top: -1px;
-}
-
-/*-----------------------------------*\
-	$MAIN
-\*-----------------------------------*/
-
-html {
-	font: 125%/1.5 Helvetica Neue, Helvetica, Arial, sans-serif;
-}
-
-@media screen and (max-width: 650px) {
-	html {
-		font-size: 100%;
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
 	}
-}
-
-.center {
-	text-align: center
+	#icons {
+		margin: 0;
+		padding: 0;
 	}
-</style>
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+	
+	.travelsegment {
+		display: none;
+	}
+	
+	</style>
+
+	<script src="js/vendor/custom.modernizr.js"></script>
+
 </head>
-<body>
-<div class="container">
-  <div class="grid">
-    <div class="unit span-grid center">
-		Yathra
-    </div>
-    <div class="unit one-of-four">
-		Från:
-    </div>
-    <div class="unit one-of-four">
-		<input type="text" name="from" id="from"/>
-    </div>
-    <div class="unit one-of-four">
-		Till: 
-    </div>
-    <div class="unit one-of-four">
-		<input type="text" name="to" id="to"/>
-    </div>
-    <div class="unit one-of-four">
-		Avgång&nbsp;tidigast:
-    </div>
-    <div class="unit one-of-four">
-		<input type="text" name="deparatureDateTime" id="deparatureDateTime" />
-    </div>
-    <div class="unit one-of-four">
-		Ankomst&nbsp;senast: 
-    </div>
-    <div class="unit one-of-four">
-		<input type="text" name="arrivalDateTime" id="arrivalDateTime" />
-    </div>
-    <div class="unit one-of-four">
-		Ålder:
-    </div>
-    <div class="unit one-of-four">
-		<input type="text" name="age" id="age" />
-    </div>
-    <div class="unit one-of-four">
-		Student: 
-    </div>
-    <div class="unit one-of-four">
-		<input type="checkbox" name="student" value="true" id="student"/>
-    </div>
-    <div class="unit one-of-four">
-		<input type="button" value="Sök" />
-    </div>
-  </div>
-</div>
+<body onload="get_value();">
+	<div id="topBanner"></div>
+	<div class="row">
+		<div class="large-12 columns text-center">
+			<div class="logotype"><img src="img/logotype.png" alt="" /></div>
+		</div>
+	</div>
+<!-- Sök - Inmatning START -->
+	<div class="row">
+		<div class="large-12 columns">
+			<div class="panel">
+				<div id="searchForm">
+					<form method="post" action="">
+						<div class="row">
+							<div class="large-6 columns">
+								<div class="ui-widget">
+								<img src="http://cdn.kidscare.se/assets/info-icon.png" onclick="window.open('http://stinsen.yathra.se/#'+fromValue)" hight="25" width="25" />
+								<div class="startIkon inputIcons">
+									<input class="from" type="text" name="fromPlace" id="from" value="" placeholder="Från" x-webkit-speech /> 
+								</div>
+								</div>
+							</div>
+							<div class="large-6 columns">
+								<img src="http://cdn.kidscare.se/assets/info-icon.png" onclick="window.open('http://stinsen.yathra.se/#'+toValue)" hight="25" width="25" />
+								<div class="finishedIkon inputIcons">
+									<input class="destination" type="text" name="destination" id="destination" value="" placeholder="Till" x-webkit-speech />
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="large-3 columns">
+								<div class="dateIkon inputIcons">
+									<input type="text" id="datepicker" placeholder="Datum" />
+								</div>
+							</div>
+							<div class="large-3 columns">
+								<div class="avanIkon inputIcons">
+									<select>
+										<option>Avgång</option>
+										<option>Ankomst</option>
+									</select>
+								</div>
+							</div>
+							<div class="large-3 columns">
+								<div class="clockIkon inputIcons">
+									<input type="time" id="timepicker" name="" value="" placeholder="Tid" />
+								</div>
+							</div>
+							<div class="large-3 columns">
+								<div class="button expand" type="button" id="searchbutton">Ta mig dit jag vill!</div>
+								<!-- AddThis Button BEGIN -->
+								<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=300&amp;pubid=ra-515efb5f6b973b52"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+								<script type="text/javascript">var addthis_config = {"data_track_addressbar":true};</script>
+								<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-515efb5f6b973b52"></script>
+								<!-- AddThis Button END -->
+							</div>
+						</div>
+						<div class="row">
+							<div class="large-12 columns">
+								<div id="progressbar"><div class="progress-label">Hämtar tider och priser...</div></div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+							<div class="large-1 columns">&nbsp;</div>
+							<div class="large-10 columns">
+							Hämtar priser från: <a href="https://www.arlandaexpress.se">Arlanda Express</a>, 
+												<a href="http://www.dalatrafik.se/">Dalatrafik </a>,
+												<a href="http://www.blekingetrafiken.se/">Blekingetrafiken</a>,
+												<a href="http://www.blataget.com">BlåTåget</a>, 
+												<a href="http://www.hlt.se">Hallandstrafiken</a>,
+												<a href="http://www.jlt.se">Jönköpings Länstrafik</a>,
+												<a href="http://www.klt.se/">Kalmar Länstrafik</a>,
+												<a href="http://www.lanstrafikenkron.se/">Länstrafiken Kronoberg</a>,
+												<a href="http://www.masexpressen.se">MasExpressen</a>,
+												<a href="http://www.nettbuss.se">nettbuss</a>, 
+												<a href="http://www.nsb.no">NSB</a>,
+												<a href="http://www.sj.se">SJ</a>,
+												<a href="http://www.skanetrafiken.se">Skånetrafiken</a>, 
+												<a href="http://www.sl.se">SL</a>,
+												<a href="http://www.snalltaget.se">Snälltåget</a>,
+												<a href="http://www.swebus.se">Swebus</a>,
+												<a href="http://www.tagkompaniet.se/">Tågkompaniet</a>,
+												<a href="http://www.vasttrafik.se">Västtrafik</a> och
+												<a href="http://www.ostgotatrafiken.se">Östgötatrafiken</a>.<br /> 
+							Priset baseras på en vuxen med reskassa. <br />
+							Tidtabellen hämtas från <a href="http://www.resrobot.se">Resrobot</a>. Yathra <a href="http://www.trafiklab.se/projekt/yathra">API</a> info. E-Post: <a href="mailto:info@yathra.se">info@yathra.se</a>.
+							</div>
+								<div class="large-1 columns">&nbsp;</div>
+		</div>
+	</div>
+<!-- Sök - Inmatning END -->
 
+<!-- Sök - Resultat START -->
+	<div id="searchResult">
+	
+<!-- En dag START
+		<div class="row">
+			<div class="large-4 large-centered columns">
+				<div class="oneDay panel text-center">
+					12 januari 2013
+				</div>
+			</div>
+		</div>
+ En resa START -->			
+		
+<!-- En resa END -->
+<!-- En dag END -->
+	</div>
+	
+	
+	
+	<!--
+	<div class="divtoggler">
+	<div class="book">
+	<img src="img/logotype.png" alt="" width="100" height="123" />
+	</div>
+	  Click here
+	</div>
+	
+	
+	<div class="divtoggler">
+		<div class="book">
+		<img src="img/logotype.png" alt="" width="100" height="123" />
+		</div>
+	  Click here
+	</div>-->
+<!-- Sök - Resultat END -->
 
+<!-- More information START -->
+   <!--<div class="large-12 columns">
+    <div class="panel moreInformation">
+     <div class="large-8 columns">
+      <h6>Reserutt</h6>
+      <div class="oneStation firstStation">
+       <div class="timeBubbleCost">Kl. 07:45</div>
+       <span class="stationName">Varberg C</span>
+      </div>
+      <div class="oneBetween">
+       
+      </div>
+      <div class="oneStation">
+       <div class="timeBubbleCost">Kl. 07:45</div>
+       <span class="stationName">Stockholm C</span>
+      </div>
+      <div class="oneBetween">
+       
+      </div>
+      <div class="oneStation lastStation">
+       <div class="timeBubbleCost">Kl. 07:45</div>
+       <span class="stationName">Hylte Maxipizzeria</span>
+      </div>
+     </div>
+     <div class="large-4 columns">
+      Mattias
+     </div>
+    </div>
+   </div>
+   <div class="large-12 columns">
+    <div class="panel moreInfo text-center">
+     <div class="showMoreInfo">Se detaljerad information</div>
+    </div>
+   </div>
+  </div>-->
+<!-- More information END -->
+
+  <script src="js/vendor/jquery-1.7.2.js"></script>
+  <script src="Material/Jquery%20Framework/jquery.mobile-1.3.0/jquery-ui.js">
+	</script>
+<script src="id-name-muni.js"></script>
+<script src="lanid-kommunid.js"></script>
+  <script type="text/javascript">
+		for (var i = 0; i < allastationer.length; i++){
+			var ut = allastationer.length-i-1;
+			allastationer[ut].label = allastationer[i].n;
+			allastationer[ut].value = allastationer[i].i;
+			var tempscb = "0"+allastationer[i].m;
+			allastationer[ut].scbid = tempscb.substr(tempscb.length - 4);
+		}
+		var rader = 0;
+		var toString;
+		var fromString;
+		
+	
+		CreateTrip = function(trip,currentTrip)
+		{
+			var priceone;
+			var startDeparture;
+			var	endarrival;
+			var firstSegment;
+			var lastSegment;
+			var segmentLength = 0;
+			var	byten = trip.segment.length;
+			byten = byten - 1;
+			segmentLength = trip.segment.length;
+			firstSegment = trip.segment[0];
+			startDeparture = trip.segment[0].departure.datetime;
+			endarrival = trip.segment[trip.segment.length-1].arrival.datetime;
+			lastSegment = trip.segment[trip.segment.length-1];
+		
+			if(byten > 0 ){
+			priceone = firstSegment.lowestpriceseller.name +':'+ firstSegment.lowestprice +' SEK ->';
+			}
+			else {
+			priceone = "";
+			}
+			if(firstSegment.segmentid.mot.type == "G")
+			{
+			carrier = new Object();
+			carrier.name =  "Gå";
+			firstSegment.segmentid.carrier = carrier;}
+			
+			var stations = 'Mer'+
+'<div class="travelsegment">\
+	<div class="large-12 columns">\
+		<div class="panel moreInformation">\
+				<h6>Reserutt</h6>\
+				<div class="oneStation firstStation">\
+				   <div class="timeBubbleCost">' + firstSegment.departure.datetime.substring(11) + '</div>\
+				   <span class="stationName"><a href="http://stinsen.yathra.se/#'+firstSegment.departure.location.id+'" target="_blank" style="color:white;">' + firstSegment.departure.location.name + "</a><br />" + firstSegment.segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+firstSegment.lowestpriceseller.url +'" target="_blank">'+ priceone +'</a></span>\
+				</div>\
+				<div class="oneBetween">\
+				</div>';
+				
+			for(var i = 1;i < segmentLength;i++)
+			{
+			if(trip.segment[i].segmentid.mot.type == "G")
+			{
+			carrier = new Object();
+			carrier.name =  "Gå";
+			trip.segment[i].segmentid.carrier = carrier;
+			}
+			
+			stations = stations +
+'				<div class="oneStation">\
+       				<div class="timeBubbleCost">' + trip.segment[i-1].arrival.datetime.substring(11) + '</div>\
+       				<div class="timeBubbleCost">' + trip.segment[i].departure.datetime.substring(11) + '</div>\
+       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+trip.segment[i].departure.location.id+'" target="_blank" style="color:white;">' + trip.segment[i].departure.location.name + "</a><br />"  + trip.segment[i].segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +':'+ trip.segment[i].lowestprice +' SEK -></a></span>\
+      			</div>\
+	  			<div class="oneBetween">\
+      			</div>';
+			}
+			
+		stations = stations + 
+'				<div class="oneStation lastStation">\
+       				<div class="timeBubbleCost">' + lastSegment.arrival.datetime.substring(11) + '</div>\
+       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+lastSegment.arrival.location.id+'" target="_blank" style="color:white;">' + lastSegment.arrival.location.name + '</a></span>\
+      			</div>\
+	 	</div>\
+	</div>\
+</div><!--<div class="row"><div class="columns large-12">Se detaljerad information</div></div>-->';
+			rader++;
+			$('#searchResult').prepend('<div class="row" id="ssvar'+rader+'">  \
+			<div class="large-12 columns"> \
+				<div class="oneTrip panel"> \
+					<div class="large-12 columns no-padding"> \
+						<div class="large-8 columns cityTime"> \
+							<div class="row"> \
+								<div class="large-8 columns no-padding"> \
+									<div class="startIkon inputIcons iconsSmall"> \
+										<span class="cityName"> ' + fromString + ' </span> \
+									</div> \
+								</div> \
+								<div class="large-4 columns"> \
+									<span class="resultTime">' + startDeparture + '</span> \
+								</div> \
+							</div> \
+							<div class="row"> \
+								<div class="large-8 columns no-padding"> \
+									<div class="finishedIkon inputIcons iconsSmall"> \
+										<span class="cityName"> ' + toString + '</span> \
+									</div> \
+								</div> \
+								<div class="large-4 columns"> \
+									<span class="resultTime">' + endarrival + '</span> \
+								</div> \
+							</div> \
+						</div> \
+						<div class="large-4 columns"> \
+							<div class="row"> \
+								<div class="columns large-12 small-6"> \
+									<span class="tripInfo">Total restid:</span> \
+									<span class="tripInfoNumber">' + trip.traveltimetotal + '</span> \
+								</div> \
+								<div class="columns large-12 small-6"> \
+									<span class="tripInfo">Antal byten:</span> \
+									<span class="tripInfoNumber">' + byten + ' byten</span> \
+								</div> \
+								<div class="columns large-12"> \
+									<span class="tripInfo">fr. Pris:</span> \
+									<div class="priceTag"> \
+										<div class="priceBefore"></div> \
+										<div class="price"><a href="'+trip.url+'" target="_blank">' + trip.sellername + ':' + trip.price + ' SEK</a></div> \
+										<div class="priceAfter"></div> \
+									</div> \
+								</div> \
+							</div> \
+						</div> \
+					</div> \
+					<img onclick="$(\'#ssvar'+rader+'\').remove();" src="http://icons.iconarchive.com/icons/custom-icon-design/pretty-office-3/48/remove-ticket-icon.png" />\
+				</div> \
+			</div> \
+			<div class="large-12 columns">\
+			<div class="panel moreInfo text-center">\
+			 <div class="showMoreInfo">\
+			 	<div class ="divtoggler">\
+			 	'+ stations +'\
+			 	</div>\
+			 </div>\
+			</div>\
+		   </div>\
+		</div>');
+	 	 
+		};
+  
+		$("#searchbutton").click(function() {
+		document.title = "Yathra: " + fromString + " -> " + toString;
+		 $("#progressbar").show();
+		 var query = "from=" + fromValue + "&to=" + toValue + "&date=" + encodeURI($('#datepicker').attr('value')) + "&departureTime=" + $('#timepicker').attr('value');
+		  window.location.hash = query;
+		  $.get("finder.php", query)
+			.done(function(data)
+			{
+				$("#progressbar").hide();
+				tripData = data;
+				for(var i = tripData.timetableresult.ttitem.length-1 ;i > -1 ;i--)
+				{
+					CreateTrip(tripData.timetableresult.ttitem[i],i);
+				}
+				$('.divtoggler').click(function() {
+						$(this).children("div").toggle('slow', function() {
+					});
+				});
+			});
+		});
+		
+		var fromValue;
+		var toValue;
+		
+		
+		var fromnames = [];
+		var destinationnames = [];
+		var fromIds = [];
+		var destinationids = [];
+		var fromAutoCompleted = false;
+		var toAutoCompleted = false;
+		
+		$( "#datepicker" ).datepicker({ dateFormat: 'yy-mm-dd',numberOfMonths: 3, minDate: -0, maxDate: +60, showWeek: true, firstDay: 1});
+		
+		$( "#from" ).autocomplete({
+      minLength: 2,
+      source: function(request, response) {
+        var results = $.ui.autocomplete.filter(allastationer, request.term);
+
+        response(results.slice(0, 10));
+    },
+      focus: function( event, ui ) {
+        $( "#from" ).val( ui.item.label );
+        return false;
+      },
+      select: function( event, ui ) {
+        $( "#from" ).val( ui.item.label );
+        fromValue = ui.item.value;
+        fromString = ui.item.label;
+        return false;
+      }
+    })
+    .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+      return $( "<li>" )
+        .append( "<a><b>" + item.label + "</b><br>" + kommun[item.scbid] + ", " + lan[item.scbid.substr(0,2)]+ "</a>" )
+        .appendTo( ul );
+    };
+    
+    $( "#destination" ).autocomplete({
+      minLength: 2,
+      source: function(request, response) {
+        var results = $.ui.autocomplete.filter(allastationer, request.term);
+
+        response(results.slice(0, 10));
+    },
+      focus: function( event, ui ) {
+        $( "#destination" ).val( ui.item.label );
+        return false;
+      },
+      select: function( event, ui ) {
+        $( "#destination" ).val( ui.item.label );
+        toValue = ui.item.value;
+        toString = ui.item.label;
+        return false;
+      }
+    })
+    .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+      return $( "<li>" )
+        .append( "<a><b>" + item.label + "</b><br>" + kommun[item.scbid] + ", " + lan[item.scbid.substr(0,2)]+ "</a>" )
+        .appendTo( ul );
+    };
+    
+		function get_value(){
+			var urldelar = decodeURIComponent(window.location).split("#");
+			_GET = new Array();
+			if (urldelar[1] != undefined){
+				urldelar = urldelar[1].split("&");
+				for (var i=0;i<urldelar.length;i++){
+   					 var pair = urldelar[i].split("=");
+      					_GET[pair[0]] = pair[1];
+    				}
+			}
+			
+			$("#datepicker").val(_GET["date"]);
+			$("#timepicker").val(_GET["departureTime"]);
+
+			var firstdone = false;
+			fromValue = _GET["from"];
+			toValue = _GET["to"];
+			
+			$.getJSON('prisAPI/stations/' + _GET["from"],
+                function(json) {  
+                    $("#from").val(json.name); 
+					fromString = json.name;
+					if(firstdone == true){
+						$("#searchbutton").click();
+					}   
+					firstdone = true;
+                } );
+            					
+        	$.getJSON('prisAPI/stations/' + _GET["to"],
+                function(json) {  
+                    $("#destination").val(json.name);  
+                    toString = json.name;
+                    if(firstdone == true){
+						$("#searchbutton").click();
+					}   
+					firstdone = true;
+                } );
+
+		}
+		
+		 $(function() {
+				var progressbar = $("#progressbar"),
+				progressLabel = $( ".progress-label" );
+				progressbar.progressbar({value: false});
+			});
+			
+			$("#progressbar").hide();
+	</script>
+  <script src="js/foundation.min.js"></script>
+  
+  <script>
+    $(document).foundation();
+  </script>
 </body>
 </html>
