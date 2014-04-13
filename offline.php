@@ -1,6 +1,6 @@
 <?php header('Content-Type: text/manifest'); ?>
 CACHE MANIFEST
-#Ver 5
+#Ver 7
 
 CACHE:
 /index.html
