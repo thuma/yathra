@@ -127,16 +127,11 @@
 							</div>
 							<div class="large-3 columns">
 								<div class="button expand" type="button" id="searchbutton">Ta mig dit jag vill!</div>
-								<!-- AddThis Button BEGIN -->
-								<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=300&amp;pubid=ra-515efb5f6b973b52"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
-								<script type="text/javascript">var addthis_config = {"data_track_addressbar":true};</script>
-								<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-515efb5f6b973b52"></script>
-								<!-- AddThis Button END -->
 							</div>
 						</div>
-						<div class="row">
+						<div class="row" id="progressbar">
 							<div class="large-12 columns">
-								<div id="progressbar"><div class="progress-label">Hämtar tider och priser...</div></div>
+								<div class="progress-label">Hämtar tider och priser...</div>
 							</div>
 						</div>
 					</form>
@@ -172,86 +167,17 @@
 		</div>
 	</div>
 <!-- Sök - Inmatning END -->
-
-<!-- Sök - Resultat START -->
 	<div id="searchResult">
 	
-<!-- En dag START
-		<div class="row">
-			<div class="large-4 large-centered columns">
-				<div class="oneDay panel text-center">
-					12 januari 2013
-				</div>
-			</div>
-		</div>
- En resa START -->			
-		
-<!-- En resa END -->
-<!-- En dag END -->
-	</div>
-	
-	
-	
-	<!--
-	<div class="divtoggler">
-	<div class="book">
-	<img src="img/logotype.png" alt="" width="100" height="123" />
-	</div>
-	  Click here
-	</div>
-	
-	
-	<div class="divtoggler">
-		<div class="book">
-		<img src="img/logotype.png" alt="" width="100" height="123" />
-		</div>
-	  Click here
-	</div>-->
-<!-- Sök - Resultat END -->
 
-<!-- More information START -->
-   <!--<div class="large-12 columns">
-    <div class="panel moreInformation">
-     <div class="large-8 columns">
-      <h6>Reserutt</h6>
-      <div class="oneStation firstStation">
-       <div class="timeBubbleCost">Kl. 07:45</div>
-       <span class="stationName">Varberg C</span>
-      </div>
-      <div class="oneBetween">
-       
-      </div>
-      <div class="oneStation">
-       <div class="timeBubbleCost">Kl. 07:45</div>
-       <span class="stationName">Stockholm C</span>
-      </div>
-      <div class="oneBetween">
-       
-      </div>
-      <div class="oneStation lastStation">
-       <div class="timeBubbleCost">Kl. 07:45</div>
-       <span class="stationName">Hylte Maxipizzeria</span>
-      </div>
-     </div>
-     <div class="large-4 columns">
-      Mattias
-     </div>
-    </div>
-   </div>
-   <div class="large-12 columns">
-    <div class="panel moreInfo text-center">
-     <div class="showMoreInfo">Se detaljerad information</div>
-    </div>
-   </div>
-  </div>-->
-<!-- More information END -->
-
-  <script src="js/vendor/jquery-1.7.2.js"></script>
-  <script src="Material/Jquery%20Framework/jquery.mobile-1.3.0/jquery-ui.js">
-	</script>
+	</div>
+	
+<script src="js/vendor/jquery-1.7.2.js"></script>
+<script src="Material/Jquery%20Framework/jquery.mobile-1.3.0/jquery-ui.js"></script>
 <script src="id-name-muni.js"></script>
 <script src="lanid-kommunid.js"></script>
-  <script type="text/javascript">
+
+<script type="text/javascript">
 		for (var i = 0; i < allastationer.length; i++){
 			var ut = allastationer.length-i-1;
 			allastationer[ut].label = allastationer[i].n;
@@ -492,6 +418,7 @@
 			$("#timepicker").val(_GET["departureTime"]);
 
 			var firstdone = false;
+			var secondone = false;
 			fromValue = _GET["from"];
 			toValue = _GET["to"];
 			
@@ -499,13 +426,17 @@
 				if(allastationer[i].value == _GET["from"]){
 					$("#from").val(allastationer[i].label);
 					fromString=allastationer[i].label;
+					firstdone = true;
 				}
 				if(allastationer[i].value == _GET["to"]){
 					$("#destination").val(allastationer[i].label);
 					toString = allastationer[i].label;
+					secondone = true;
 				}
 			}
-			$("#searchbutton").click();
+			if(firstdone ==  true && secondone == true){
+				$("#searchbutton").click();
+			}			
 		}
 		
 		 $(function() {
@@ -515,11 +446,13 @@
 			});
 			
 			$("#progressbar").hide();
-	</script>
-  <script src="js/foundation.min.js"></script>
+</script>
+
+<script src="js/foundation.min.js"></script>
   
-  <script>
+<script>
     $(document).foundation();
-  </script>
+</script>
+
 </body>
 </html>
