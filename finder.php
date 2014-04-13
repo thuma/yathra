@@ -13,14 +13,14 @@ if (preg_match("/(2[0-3]|[01][0-9]):[0-5][0-9]/", $_GET['departureTime']) == FAL
 if (preg_match("/201[0-9]-(0[0-9]|[1][0-2])-[0-3][0-9]/", $_GET['date']) == FALSE){
 	die('{"error":"Error in date shhould be: YYYY-MM-DD , but is: '.$_GET['date'].' "}');
 	} 
-if (file_exists('prisAPI/stations/'.$_GET['from']) == FALSE)
+/*if (file_exists('prisAPI/stations/'.$_GET['from']) == FALSE)
 	{
 	die('{"error":"Error from station does not exist"}');
 	} 
 if (file_exists('prisAPI/stations/'.$_GET['to']) == FALSE)
 	{
 	die('{"error":"Error to station does not exist"}');
-	}
+	}*/
 
 // Check if in cache:
 asort($_GET);
@@ -58,7 +58,7 @@ T   Train and local public transport. Express buses are not included in the sear
 B   Express bus and local public transport. Regional trains and speed trains are not included in the search.
 */
 '&arrival=false'.
-'&key=<ADD TRAFIK LAB KEY HERE>');
+'&key=<Key>');
 /*
 '&mode1=true'. //Speed train. X2000 and Arlanda Express
 '&mode2=true'. //Train (except speed trains)
