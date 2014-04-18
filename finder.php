@@ -41,7 +41,7 @@ $_GET['date'] = "2013-04-18";
 $_GET['departureTime'] = "21:10";
 */
 
-$outobject;
+$outobject = new stdClass;
 $outobject->totaltimeaftercache = microtime(true) - $start;
 
 // Init search:
@@ -58,7 +58,8 @@ T   Train and local public transport. Express buses are not included in the sear
 B   Express bus and local public transport. Regional trains and speed trains are not included in the search.
 */
 '&arrival=false'.
-'&key='.file_get_contents('resrobot.key'));
+'&key='.file_get_contents('../resrobot.key'));
+
 /*
 '&mode1=true'. //Speed train. X2000 and Arlanda Express
 '&mode2=true'. //Train (except speed trains)
@@ -157,7 +158,6 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	}
 }
 
-
 //Sellers; print $urlstring;
 $sellers["VT"][0] 		= "http://api1.yathra.se/prisAPI/vt.php?";
 $sellers["BT"][0]		= "http://pi.thure.org:8800/bt/?";
@@ -224,7 +224,6 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 			curl_multi_add_handle($curlmultihande,$trip->search->responce[$name]->handle);
 			}
 		}
-
 	if(count($trip->segment)>1){
 		foreach($trip->segment as &$segment){
 			if($segment->segmentid->mot->type != "G"){
@@ -238,6 +237,7 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 			}
 		}
 	}
+	
 	do {
     curl_multi_exec($curlmultihande,$running);
    	// Lets try not sleeping. sleep(1);
