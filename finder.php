@@ -148,6 +148,7 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 			}
 			else
 			{
+				$segment->search = new stdClass;
 				$segment->search->url = ''.
 							'from='.$segment->departure->location->id.
 							'&to='.$segment->arrival->location->id.
@@ -160,17 +161,17 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 
 //Sellers; print $urlstring;
 $sellers["VT"][0] 		= "http://api1.yathra.se/prisAPI/vt.php?";
-$sellers["BT"][0]		= "http://pi.thure.org:8800/bt/?";
 $sellers["NSB"][0] 		= "http://api1.yathra.se/prisAPI/nsb.php?";
 $sellers["AEX"][0] 		= "http://api1.yathra.se/prisAPI/at.php?";
 $sellers["OT"][0] 		= "http://api1.yathra.se/prisAPI/ot.php?";
-$sellers["NETTBUSS"][0]	= "http://pi.thure.org:8800/nettbuss/?";
 $sellers["SL"][0] 		= "http://api1.yathra.se/prisAPI/sl.php?";
+$sellers["SKTR"][0] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
+$sellers["TIB"][0] 		= "http://api1.yathra.se/prisAPI/tib.php?";
+$sellers["NETTBUSS"][0]	= "http://pi.thure.org:8800/nettbuss/?";
 $sellers["SJ"][0] 		= "http://pi.thure.org:8800/sj/?";
 $sellers["HLT"][0] 		= "http://pi.thure.org:8800/hlt/?";
-$sellers["SKTR"][0] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
 $sellers["SWEBUS"][0] 	= "http://pi.thure.org:8800/swebus/?";
-$sellers["TIB"][0] 		= "http://api1.yathra.se/prisAPI/tib.php?";
+$sellers["BT"][0]		= "http://pi.thure.org:8800/bt/?";
 $sellers["Snt"][0] 		= "http://pi.thure.org:8800/snalltaget/?";
 $sellers["JLT"][0] 		= "http://pi.thure.org:8800/jlt/?";
 $sellers["DTR"][0] 		= "http://pi.thure.org:8800/dtr/?";
@@ -219,8 +220,11 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	foreach($sellers as $name => $seller){
 	
 		if(isset($trip->search->url)){
+			$trip->search->responce[$name] = new stdClass;
 			$trip->search->responce[$name]->handle = curl_init($seller[$server].$trip->search->url);
 			curl_setopt($trip->search->responce[$name]->handle,CURLOPT_RETURNTRANSFER,TRUE);
+			curl_setopt($trip->search->responce[$name]->handle, CURLOPT_CONNECTTIMEOUT ,20); 
+			curl_setopt($trip->search->responce[$name]->handle, CURLOPT_TIMEOUT, 20);
 			curl_multi_add_handle($curlmultihande,$trip->search->responce[$name]->handle);
 			}
 		}
@@ -229,8 +233,11 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 			if($segment->segmentid->mot->type != "G"){
 				foreach($sellers as $name => $seller){
 					if(isset($segment->search->url)){
+						$segment->search->responce[$name] = new stdClass;
 						$segment->search->responce[$name]->handle = curl_init($seller[$server].$segment->search->url);
 						curl_setopt($segment->search->responce[$name]->handle,CURLOPT_RETURNTRANSFER,TRUE);
+						curl_setopt($trip->search->responce[$name]->handle, CURLOPT_CONNECTTIMEOUT ,20); 
+						curl_setopt($trip->search->responce[$name]->handle, CURLOPT_TIMEOUT, 20);
 						curl_multi_add_handle($curlmultihande,$segment->search->responce[$name]->handle);
 					}
 				}	
@@ -317,6 +324,7 @@ $totalseller = "";
 			}
 		}
 		$segment->lowestprice = strval($lowest);
+		$segment->lowestpriceseller = new stdClass;
 		$segment->lowestpriceseller->name = $seller;
 		$segment->lowestpriceseller->url = $url;
 		$total = $total + $lowest;
