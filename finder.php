@@ -58,7 +58,7 @@ T   Train and local public transport. Express buses are not included in the sear
 B   Express bus and local public transport. Regional trains and speed trains are not included in the search.
 */
 '&arrival=false'.
-'&key=<Key>');
+'&key='.file_get_contents('resrobot.key'));
 /*
 '&mode1=true'. //Speed train. X2000 and Arlanda Express
 '&mode2=true'. //Train (except speed trains)
@@ -160,16 +160,16 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 
 //Sellers; print $urlstring;
 $sellers["VT"][0] 		= "http://api1.yathra.se/prisAPI/vt.php?";
-$sellers["BT"][0]		= "http://api1.yathra.se/prisAPI/bt.php?";
+$sellers["BT"][0]		= "http://pi.thure.org:8800/bt/?";
 $sellers["NSB"][0] 		= "http://api1.yathra.se/prisAPI/nsb.php?";
 $sellers["AEX"][0] 		= "http://api1.yathra.se/prisAPI/at.php?";
 $sellers["OT"][0] 		= "http://api1.yathra.se/prisAPI/ot.php?";
-$sellers["NETTBUSS"][0] = "http://api1.yathra.se/prisAPI/nettbuss.php?";
+$sellers["NETTBUSS"][0]	= "http://pi.thure.org:8800/nettbuss/?";
 $sellers["SL"][0] 		= "http://api1.yathra.se/prisAPI/sl.php?";
 $sellers["SJ"][0] 		= "http://pi.thure.org:8800/sj/?";
 $sellers["HLT"][0] 		= "http://pi.thure.org:8800/hlt/?";
 $sellers["SKTR"][0] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
-$sellers["SWEBUS"][0] 	= "http://api1.yathra.se/prisAPI/swebus.php?";
+$sellers["SWEBUS"][0] 	= "http://pi.thure.org:8800/swebus/?";
 $sellers["TIB"][0] 		= "http://api1.yathra.se/prisAPI/tib.php?";
 $sellers["Snt"][0] 		= "http://pi.thure.org:8800/snalltaget/?";
 $sellers["JLT"][0] 		= "http://pi.thure.org:8800/jlt/?";
