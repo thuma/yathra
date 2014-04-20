@@ -34,12 +34,6 @@ if(file_exists('findercache/'.$cachefile)){
 }
 
 set_time_limit(120);
-// Prepair default search parameters:
-/*$_GET['from'] = "7400001";
-$_GET['to'] = "7400110";
-$_GET['date'] = "2013-04-18";
-$_GET['departureTime'] = "21:10";
-*/
 
 $outobject = new stdClass;
 $outobject->totaltimeaftercache = microtime(true) - $start;
@@ -78,7 +72,7 @@ $resultstring = str_replace('"#','"',$resultstring);
 $resultstring = str_replace('"@','"',$resultstring);
 $resultobject = json_decode(utf8_encode($resultstring));
 
-// Generator object $visa 4 results;
+// Generator object $visa 3 results;
 $outobject->totaltimeafterreqtotr = microtime(true) - $start;
 $i = 0;
 // Loop max 3 hits:
@@ -142,12 +136,13 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	if($last > $first){
 	// Generate price querys:
 		foreach($trip->segment as &$segment){
-			$segment->segmentid->carrier->name = $agencylist[$segment->segmentid->carrier->id];
+			//$segment->segmentid->carrier->name = $agencylist[$segment->segmentid->carrier->id];
 			if($segment->segmentid->mot->type == "G"){
 				$segment->price = "0";
 			}
 			else
 			{
+				$segment->search = new stdClass;
 				$segment->search->url = ''.
 							'from='.$segment->departure->location->id.
 							'&to='.$segment->arrival->location->id.
@@ -158,19 +153,21 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	}
 }
 
+$outobject->totaltimeafterurls = microtime(true) - $start;
+
 //Sellers; print $urlstring;
 $sellers["VT"][0] 		= "http://api1.yathra.se/prisAPI/vt.php?";
-$sellers["BT"][0]		= "http://pi.thure.org:8800/bt/?";
 $sellers["NSB"][0] 		= "http://api1.yathra.se/prisAPI/nsb.php?";
 $sellers["AEX"][0] 		= "http://api1.yathra.se/prisAPI/at.php?";
 $sellers["OT"][0] 		= "http://api1.yathra.se/prisAPI/ot.php?";
-$sellers["NETTBUSS"][0]	= "http://pi.thure.org:8800/nettbuss/?";
 $sellers["SL"][0] 		= "http://api1.yathra.se/prisAPI/sl.php?";
+$sellers["SKTR"][0] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
+$sellers["TIB"][0] 		= "http://api1.yathra.se/prisAPI/tib.php?";
+$sellers["NETTBUSS"][0]	= "http://pi.thure.org:8800/nettbuss/?";
 $sellers["SJ"][0] 		= "http://pi.thure.org:8800/sj/?";
 $sellers["HLT"][0] 		= "http://pi.thure.org:8800/hlt/?";
-$sellers["SKTR"][0] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
 $sellers["SWEBUS"][0] 	= "http://pi.thure.org:8800/swebus/?";
-$sellers["TIB"][0] 		= "http://api1.yathra.se/prisAPI/tib.php?";
+$sellers["BT"][0]		= "http://pi.thure.org:8800/bt/?";
 $sellers["Snt"][0] 		= "http://pi.thure.org:8800/snalltaget/?";
 $sellers["JLT"][0] 		= "http://pi.thure.org:8800/jlt/?";
 $sellers["DTR"][0] 		= "http://pi.thure.org:8800/dtr/?";
@@ -207,11 +204,11 @@ $sellers["TIB"][2] 		= "http://api1.yathra.se/prisAPI/tib.php?";
 $sellers["Snt"][2] 		= "http://[2001:16d8:ff00:2cb::2]:8800/snalltaget/?";
 */
 
-$outobject->totaltimebeforegenerate = microtime(true) - $start;
-
 //create the multiple cURL handle
 $curlmultihande = curl_multi_init();
 $running=null;
+
+
 
 $server = 0;
 //do all the CURL requests;
@@ -219,19 +216,35 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	foreach($sellers as $name => $seller){
 	
 		if(isset($trip->search->url)){
-			$trip->search->responce[$name]->handle = curl_init($seller[$server].$trip->search->url);
-			curl_setopt($trip->search->responce[$name]->handle,CURLOPT_RETURNTRANSFER,TRUE);
-			curl_multi_add_handle($curlmultihande,$trip->search->responce[$name]->handle);
+			if(isset($trip->search->responce)==False){
+				$trip->search->responce = array();
+				}
+			$trip->search->responce[$name]->chandle = curl_init($seller[$server].$trip->search->url);
+			curl_setopt($trip->search->responce[$name]->chandle,CURLOPT_RETURNTRANSFER,TRUE);
+			curl_setopt($trip->search->responce[$name]->chandle, CURLOPT_CONNECTTIMEOUT ,20); 
+			curl_setopt($trip->search->responce[$name]->chandle, CURLOPT_TIMEOUT, 20);
+			curl_multi_add_handle($curlmultihande,$trip->search->responce[$name]->chandle);
+			curl_multi_exec($curlmultihande, $running);
 			}
 		}
+	do {
+	curl_multi_exec($curlmultihande, $running);
+	} while($running > 0);	
+	
 	if(count($trip->segment)>1){
 		foreach($trip->segment as &$segment){
 			if($segment->segmentid->mot->type != "G"){
 				foreach($sellers as $name => $seller){
 					if(isset($segment->search->url)){
-						$segment->search->responce[$name]->handle = curl_init($seller[$server].$segment->search->url);
-						curl_setopt($segment->search->responce[$name]->handle,CURLOPT_RETURNTRANSFER,TRUE);
-						curl_multi_add_handle($curlmultihande,$segment->search->responce[$name]->handle);
+						if(isset($segment->search->responce)==False){
+							$segment->search->responce = array();
+						}
+						$segment->search->responce[$name]->chandle = curl_init($seller[$server].$segment->search->url);
+						curl_setopt($segment->search->responce[$name]->chandle,CURLOPT_RETURNTRANSFER,TRUE);
+						curl_setopt($segment->search->responce[$name]->chandle, CURLOPT_CONNECTTIMEOUT ,20); 
+						curl_setopt($segment->search->responce[$name]->chandle, CURLOPT_TIMEOUT, 20);
+						curl_multi_add_handle($curlmultihande,$segment->search->responce[$name]->chandle);
+						curl_multi_exec($curlmultihande, $running);
 					}
 				}	
 			}
@@ -239,10 +252,8 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	}
 	
 	do {
-    curl_multi_exec($curlmultihande,$running);
-   	// Lets try not sleeping. sleep(1);
-	} while($running > 0);
-
+	curl_multi_exec($curlmultihande, $running);
+	} while($running > 0);	
 	$server++;
 	if ($server > 2){
 		$server = 0;
@@ -250,35 +261,25 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	$server = 0;
 }
 
-$outobject->totaltimebeforeask = microtime(true) - $start;
-
-//execute the handles this will take time!
-do {
-    curl_multi_exec($curlmultihande,$running);
-   // Lets try not sleeping. sleep(1);
-} while($running > 0);
-
 $outobject->totaltimedoneask = microtime(true) - $start;
 
 //Get responce all the CURL requests;
 foreach($outobject->timetableresult->ttitem as &$trip){
 	foreach($trip->search->responce as &$responce){
-		if(isset($responce->handle)){
-			$responce->pricedata = json_decode(curl_multi_getcontent($responce->handle));
-			$responce->pricedatatime = strval(curl_getinfo($responce->handle, CURLINFO_TOTAL_TIME));
-			curl_close($responce->handle);
-			$responce->handle = "";
+		if(isset($responce->chandle)){
+			$responce->pricedata = json_decode(curl_multi_getcontent($responce->chandle));
+			$responce->pricedatatime = strval(curl_getinfo($responce->chandle, CURLINFO_TOTAL_TIME));
+			$responce->chandle = '';
 		}
 	}
 
 	foreach($trip->segment as &$segment){
 		if(isset($segment->search->responce)){
 			foreach($segment->search->responce as &$responce){
-				if(isset($responce->handle)){
-					$responce->pricedata = json_decode(curl_multi_getcontent($responce->handle));
-					$responce->pricedatatime = strval(curl_getinfo($responce->handle, CURLINFO_TOTAL_TIME));
-					curl_close($responce->handle);
-					$responce->handle = "";
+				if(isset($responce->chandle)){
+					$responce->pricedata = json_decode(curl_multi_getcontent($responce->chandle));
+					$responce->pricedatatime = strval(curl_getinfo($responce->chandle, CURLINFO_TOTAL_TIME));
+					$responce->chandle = '';
 				}
 			}
 		}
@@ -298,7 +299,7 @@ $totalseller = "";
 		$seller = "";
 		$url = "";
 		
-		// IF the section has a 0 price (Walking set price to 0;)
+		// IF the section has a 0 price (Walking sets price to 0;)
 		if(isset($segment->price)){
 			if($segment->price == "0"){
 			$lowest = 0;
@@ -317,6 +318,7 @@ $totalseller = "";
 			}
 		}
 		$segment->lowestprice = strval($lowest);
+		$segment->lowestpriceseller = new stdClass;
 		$segment->lowestpriceseller->name = $seller;
 		$segment->lowestpriceseller->url = $url;
 		$total = $total + $lowest;
