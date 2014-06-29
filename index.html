@@ -33,6 +33,11 @@
 		text-shadow: 1px 1px 0 #fff;
 	}
 	
+	body{
+		zoom: 70%;
+		-moz-transform: scale(0.8);
+	}
+	
 	.demoHeaders {
 		margin-top: 2em;
 	}
@@ -109,24 +114,27 @@
 						<div class="row">
 							<div class="large-3 columns">
 								<div class="dateIkon inputIcons">
-									<input type="text" id="datepicker" placeholder="Datum" />
+									<input type="text" id="datepicker" placeholder="Avg.Datum" />
 								</div>
 							</div>
-							<div class="large-3 columns">
-								<div class="avanIkon inputIcons">
-									<select>
-										<option>Avgång</option>
-										<option>Ankomst</option>
-									</select>
-								</div>
-							</div>
-							<div class="large-3 columns">
+							<div class="large-2 columns">
 								<div class="clockIkon inputIcons">
-									<input type="time" id="timepicker" name="" value="" placeholder="Tid" />
+									<input type="time" id="timepicker" name="" value="" placeholder="Avg.Tid" />
 								</div>
 							</div>
 							<div class="large-3 columns">
+								<div class="dateIkon inputIcons">
+									<input type="text" id="datepickera" placeholder="Ank.Datum" />
+								</div>
+							</div>
+							<div class="large-2 columns">
+								<div class="clockIkon inputIcons">
+									<input type="time" id="timepickera" name="" value="" placeholder="Ank.Tid" />
+								</div>
+							</div>
+							<div class="large-2 columns">
 								<div class="button expand" type="button" id="searchbutton">Ta mig dit jag vill!</div>
+								<a href="" id="delalink">Dela sökning</a>
 							</div>
 						</div>
 						<div class="row" id="progressbar">
@@ -178,6 +186,7 @@
 <script src="lanid-kommunid.js"></script>
 
 <script type="text/javascript">
+		var avgnr = 0;
 		for (var i = 0; i < allastationer.length; i++){
 			var ut = allastationer.length-i-1;
 			allastationer[ut].label = allastationer[i].n;
@@ -189,16 +198,15 @@
 		var toString;
 		var fromString;
 		
-	
 		CreateTrip = function(trip,currentTrip)
 		{
 			var priceone;
 			var startDeparture;
-			var	endarrival;
+			var endarrival;
 			var firstSegment;
 			var lastSegment;
 			var segmentLength = 0;
-			var	byten = trip.segment.length;
+			var byten = trip.segment.length;
 			byten = byten - 1;
 			segmentLength = trip.segment.length;
 			firstSegment = trip.segment[0];
@@ -258,7 +266,7 @@
 	</div>\
 </div><!--<div class="row"><div class="columns large-12">Se detaljerad information</div></div>-->';
 			rader++;
-			$('#searchResult').prepend('<div class="row" id="ssvar'+rader+'">  \
+			$('#searchResult').append('<div class="row" id="ssvar'+rader+'">  \
 			<div class="large-12 columns"> \
 				<div class="oneTrip panel"> \
 					<div class="large-12 columns no-padding"> \
@@ -324,13 +332,18 @@
 		$("#searchbutton").click(function() {
 		document.title = "Yathra: " + fromString + " -> " + toString;
 		 $("#progressbar").show();
-		 var query = "from=" + fromValue + "&to=" + toValue + "&date=" + encodeURI($('#datepicker').attr('value')) + "&departureTime=" + $('#timepicker').attr('value');
-		  window.location.hash = query;
+	
+		 var query = "avgnr="+avgnr+"&from=" + fromValue + "&to=" + toValue + "&departureDate=" + encodeURI($('#datepicker').attr('value')) + "&departureTime=" + $('#timepicker').attr('value')+ "&arrivalDate=" + encodeURI($('#datepickera').attr('value')) + "&arrivalTime=" + $('#timepickera').attr('value');
+			$('#delalink').attr("href", 'mailto:?subject=Resa från ' + fromString + ' till ' + toString + ' - '+$('#datepicker').attr('value')+'&body=Länk till resan http://www.yathra.se/#'+query.split('&').join('%26')); 
+			window.location.hash = query;
+			
 		  $.get("finder.php", query)
 			.done(function(data)
 			{
 				$("#progressbar").hide();
 				tripData = data;
+				avgnr = avgnr + 1;
+				try {
 				for(var i = tripData.timetableresult.ttitem.length-1 ;i > -1 ;i--)
 				{
 					CreateTrip(tripData.timetableresult.ttitem[i],i);
@@ -339,6 +352,16 @@
 						$(this).children("div").toggle('slow', function() {
 					});
 				});
+				
+				if(tripData.timetableresult.ttitem.length > 0){
+				  $("#searchbutton").click();
+				}
+				else{
+				  avgnr = 0;	
+				}
+				} catch (e) {
+				  alert(data.error);
+				}
 			});
 		});
 		
@@ -353,7 +376,9 @@
 		var fromAutoCompleted = false;
 		var toAutoCompleted = false;
 		
-		$( "#datepicker" ).datepicker({ dateFormat: 'yy-mm-dd',numberOfMonths: 3, minDate: -0, maxDate: +60, showWeek: true, firstDay: 1});
+		$("#datepicker").datepicker({ dateFormat: 'yy-mm-dd',numberOfMonths: 3, minDate: -0, maxDate: +60, showWeek: true, firstDay: 1});
+		$("#datepickera").datepicker({ dateFormat: 'yy-mm-dd',numberOfMonths: 3, minDate: -0, maxDate: +60, showWeek: true, firstDay: 1});
+		
 		
 		$( "#from" ).autocomplete({
       minLength: 2,
@@ -414,8 +439,10 @@
     				}
 			}
 			
-			$("#datepicker").val(_GET["date"]);
+			$("#datepicker").val(_GET["departureDate"]);
 			$("#timepicker").val(_GET["departureTime"]);
+			$("#datepickera").val(_GET["arrivalDate"]);
+			$("#timepickera").val(_GET["arrivalTime"]);
 
 			var firstdone = false;
 			var secondone = false;

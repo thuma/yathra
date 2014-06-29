@@ -3,24 +3,34 @@ if(isset($_GET['debugg'])){
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 }
+set_time_limit(120);
 
 $start = microtime(true);
 header('Content-type: application/json; charset=UTF-8');
 
+// Ceck input data:
 if (preg_match("/(2[0-3]|[01][0-9]):[0-5][0-9]/", $_GET['departureTime']) == FALSE){
 	die('{"error":"Error in departure time shhould be: HH:MM , but is: '.$_GET['departureTime'].' "}');
 	} 
-if (preg_match("/201[0-9]-(0[0-9]|[1][0-2])-[0-3][0-9]/", $_GET['date']) == FALSE){
-	die('{"error":"Error in date shhould be: YYYY-MM-DD , but is: '.$_GET['date'].' "}');
+if (preg_match("/201[0-9]-(0[0-9]|[1][0-2])-[0-3][0-9]/", $_GET['departureDate']) == FALSE){
+	die('{"error":"Error in departureDate shhould be: YYYY-MM-DD , but is: '.$_GET['departureDate'].' "}');
 	} 
-/*if (file_exists('prisAPI/stations/'.$_GET['from']) == FALSE)
-	{
-	die('{"error":"Error from station does not exist"}');
+if (preg_match("/(2[0-3]|[01][0-9]):[0-5][0-9]/", $_GET['arrivalTime']) == FALSE){
+	die('{"error":"Error in arrival time shhould be: HH:MM , but is: '.$_GET['arrivalTime'].' "}');
 	} 
-if (file_exists('prisAPI/stations/'.$_GET['to']) == FALSE)
-	{
-	die('{"error":"Error to station does not exist"}');
-	}*/
+if (preg_match("/201[0-9]-(0[0-9]|[1][0-2])-[0-3][0-9]/", $_GET['arrivalDate']) == FALSE){
+	die('{"error":"Error in arrivalDate shhould be: YYYY-MM-DD , but is: '.$_GET['arrivalDate'].' "}');
+	}
+if(strtotime($_GET["arrivalDate"].'T'.$_GET['arrivalTime']) < strtotime($_GET["departureDate"].'T'.$_GET['departureTime'])){
+	die('{"error":"First deparature is after last arrival"}');
+	}
+	
+if(isset($_GET['avgnr'])==false){
+  $_GET['avgnr'] = 0;
+}
+else{
+ $_GET['avgnr'] = intval($_GET['avgnr']);
+}
 
 // Check if in cache:
 asort($_GET);
@@ -33,26 +43,25 @@ if(file_exists('findercache/'.$cachefile)){
 	}
 }
 
-set_time_limit(120);
+// Make search url:
+$url = 'https://api.trafiklab.se/samtrafiken/resrobot/Search.json'.
+  '?apiVersion=2.1'.
+  '&coordSys=WGS84'.
+  '&fromId='.$_GET['from'].
+  '&toId='.$_GET['to'].
+  '&date='.$_GET['departureDate'].
+  '&time='.urlencode($_GET['departureTime']).
+  '&searchType=F'.
+  '&arrival=false'.
+  '&key='.file_get_contents('../resrobot.key');
+$md5url = md5($url);
 
-$outobject = new stdClass;
-$outobject->totaltimeaftercache = microtime(true) - $start;
-
-// Init search:
-$ch = curl_init('https://api.trafiklab.se/samtrafiken/resrobot/Search.json'.
-'?apiVersion=2.1'.
-'&coordSys=WGS84'.
-'&fromId='.$_GET['from'].
-'&toId='.$_GET['to'].
-'&date='.$_GET['date'].
-'&time='.urlencode($_GET['departureTime']).
-'&searchType=F'./*
-F 	Standard search. ResRobot will find the fastest trip using all possible transport modes.
-T   Train and local public transport. Express buses are not included in the search.
-B   Express bus and local public transport. Regional trains and speed trains are not included in the search.
+/*
+&searchType
+F Standard search. ResRobot will find the fastest trip using all possible transport modes.
+T Train and local public transport. Express buses are not included in the search.
+B Express bus and local public transport. Regional trains and speed trains are not included in the search.
 */
-'&arrival=false'.
-'&key='.file_get_contents('../resrobot.key'));
 
 /*
 '&mode1=true'. //Speed train. X2000 and Arlanda Express
@@ -62,33 +71,68 @@ B   Express bus and local public transport. Regional trains and speed trains are
 '&mode5=ture'); //Express bus
 */
 
-// Run search:
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$resultstring = curl_exec($ch);
-curl_close($ch);
+$run = true;
+if(file_exists('findercache/'.$md5url)){
+	$nu = filemtime('findercache/'.$md5url);
+	if(microtime(true)-$nu<10000){
+		$resultobject = json_decode(file_get_contents('findercache/'.$md5url));
+	 	$run = false;
+	}
+}
 
-//remove specialChars and make object:
-$resultstring = str_replace('"#','"',$resultstring);
-$resultstring = str_replace('"@','"',$resultstring);
-$resultobject = json_decode(utf8_encode($resultstring));
+if($run){
+  // Run search:
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $resultstring = curl_exec($ch);
+  curl_close($ch);
+  
+    //remove specialChars and make object:
+	$resultstring = str_replace('"#','"',$resultstring);
+	$resultstring = str_replace('"@','"',$resultstring);
+	$resultobject = json_decode(utf8_encode($resultstring));
+  	file_put_contents('findercache/'.$md5url, json_encode($resultobject));
+}
+
+if(isset($_GET['debugg'])){
+  print 'Tidtabellsdata: ';
+  print_r($resultobject);
+}
+
+// Generate out object:
+$outobject = new stdClass;
+$outobject->totaltimeaftercache = microtime(true) - $start;
+$outobject->timetableresult = new stdClass;
+$outobject->timetableresult->ttitem = array();
 
 // Generator object $visa 3 results;
 $outobject->totaltimeafterreqtotr = microtime(true) - $start;
 $i = 0;
+
 // Loop max 3 hits:
 foreach($resultobject->timetableresult->ttitem as &$trip){
-	if(is_array($trip->segment)){
-	  $outobject->timetableresult->ttitem[$i] = $trip;	
+	if(is_array($trip->segment) == false){
+  	  $trip->segment = array($trip->segment);
   	}
-  	else{
-  	  $outobject->timetableresult->ttitem[$i]->segment = array($trip->segment);
-  	}
-	if(strtotime($outobject->timetableresult->ttitem[$i]->segment[0]->departure->datetime) >= strtotime($_GET["date"].'T'.$_GET['departureTime']) ){
+  	
+  	$sista = end($trip->segment);
+	if(
+	strtotime($trip->segment[0]->departure->datetime) >= strtotime($_GET["departureDate"].'T'.$_GET['departureTime'])
+	&&
+	strtotime($sista->arrival->datetime) <= strtotime($_GET["arrivalDate"].'T'.$_GET['arrivalTime'])
+	){
+	
+	 if($i == $_GET['avgnr']){
+	    $outobject->timetableresult->ttitem[0] = $trip;
+	 }
   		$i++;
   	}
-  	if($i>2){
-  		break;
-  	}
+}
+
+//print_r($resultobject);
+
+if($i==0){
+	die('{"error":"No trips found in time interval"}');
 }
 
 
@@ -156,27 +200,27 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 $outobject->totaltimeafterurls = microtime(true) - $start;
 
 //Sellers; print $urlstring;
-$sellers["VT"][0] 		= "http://api1.yathra.se/prisAPI/vt.php?";
-$sellers["NSB"][0] 		= "http://api1.yathra.se/prisAPI/nsb.php?";
-$sellers["AEX"][0] 		= "http://api1.yathra.se/prisAPI/at.php?";
-$sellers["OT"][0] 		= "http://api1.yathra.se/prisAPI/ot.php?";
+$sellers["NSB"][0] 		= "http://api.yathra.se:8800/nsb/?";
+$sellers["VT"][0] 		= "http://api.yathra.se:8800/vt/?";
+$sellers["AEX"][0] 		= "http://api.yathra.se:8800/at/?";
+$sellers["TIB"][0] 		= "http://api.yathra.se:8800/tib/?";
+$sellers["OT"][0] 		= "http://api.yathra.se:8800/ot/?";
+$sellers["SKTR"][0] 		= "http://api.yathra.se:8800/sktr/?";
+$sellers["NETTBUSS"][0]		= "http://api.yathra.se:8800/nettbuss/?";
+$sellers["SJ"][0] 		= "http://api.yathra.se:8800/sj/?";
+$sellers["HLT"][0] 		= "http://api.yathra.se:8800/hlt/?";
+$sellers["SWEBUS"][0] 		= "http://api.yathra.se:8800/swebus/?";
+$sellers["BT"][0]		= "http://api.yathra.se:8800/bt/?";
+$sellers["Snt"][0] 		= "http://api.yathra.se:8800/snalltaget/?";
+$sellers["JLT"][0] 		= "http://api.yathra.se:8800/jlt/?";
+$sellers["DTR"][0] 		= "http://api.yathra.se:8800/dtr/?";
+$sellers["LTK"][0] 		= "http://api.yathra.se:8800/ltk/?";
+$sellers["BTR"][0] 		= "http://api.yathra.se:8800/btr/?";
+$sellers["XTR"][0] 		= "http://api.yathra.se:8800/xtr/?";
+$sellers["KLT"][0] 		= "http://api.yathra.se:8800/klt/?";
+$sellers["MAS"][0] 		= "http://api.yathra.se:8800/mas/?";
 $sellers["SL"][0] 		= "http://api1.yathra.se/prisAPI/sl.php?";
-$sellers["SKTR"][0] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
-$sellers["TIB"][0] 		= "http://api1.yathra.se/prisAPI/tib.php?";
-$sellers["NETTBUSS"][0]	= "http://pi.thure.org:8800/nettbuss/?";
-$sellers["SJ"][0] 		= "http://pi.thure.org:8800/sj/?";
-$sellers["HLT"][0] 		= "http://pi.thure.org:8800/hlt/?";
-$sellers["SWEBUS"][0] 	= "http://pi.thure.org:8800/swebus/?";
-$sellers["BT"][0]		= "http://pi.thure.org:8800/bt/?";
-$sellers["Snt"][0] 		= "http://pi.thure.org:8800/snalltaget/?";
-$sellers["JLT"][0] 		= "http://pi.thure.org:8800/jlt/?";
-$sellers["DTR"][0] 		= "http://pi.thure.org:8800/dtr/?";
-$sellers["LTK"][0] 		= "http://pi.thure.org:8800/ltk/?";
-$sellers["BTR"][0] 		= "http://pi.thure.org:8800/btr/?";
-$sellers["XTR"][0] 		= "http://pi.thure.org:8800/xtr/?";
-$sellers["KLT"][0] 		= "http://pi.thure.org:8800/klt/?";
-$sellers["MAS"][0] 		= "http://pi.thure.org:8800/mas/?";
-/*$sellers["VT"][1] 		= "http://api1.yathra.se/prisAPI/vt.php?";
+/*$sellers["VT"][1] 	= "http://api1.yathra.se/prisAPI/vt.php?";
 $sellers["BT"][1]		= "http://api1.yathra.se/prisAPI/bt.php?";
 $sellers["NSB"][1] 		= "http://api1.yathra.se/prisAPI/nsb.php?";
 $sellers["AEX"][1] 		= "http://api1.yathra.se/prisAPI/at.php?";
@@ -227,10 +271,7 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 			curl_multi_exec($curlmultihande, $running);
 			}
 		}
-	do {
-	curl_multi_exec($curlmultihande, $running);
-	} while($running > 0);	
-	
+
 	if(count($trip->segment)>1){
 		foreach($trip->segment as &$segment){
 			if($segment->segmentid->mot->type != "G"){
