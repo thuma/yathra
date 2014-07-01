@@ -6,25 +6,26 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width" />
   
+  <script src="js/vendor/modernizr.js"></script>
+  <script src="js/vendor/jquery.js"></script>
+  <script src="js/vendor/jquery-ui.min.js"></script>
+  <script src="js/vendor/fastclick.js"></script>
+  
   <title>Yathra: Tidtabell med priser för hela Sverige.</title>
+  <script src="js/foundation.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css">
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="js/jquery.dataTables.js"></script>
+<!-- DataTables, colReorder -->
+<script type="text/javascript" charset="utf8" src="js/dataTables.colReorder.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Wellfleet' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.css" />
+<link rel="stylesheet" href="css/foundation.css" />
+<link rel="stylesheet" href="css/jquery-ui.min.css" />
+<link rel="apple-touch-icon" href="/img/touchandoroid.png">
+<link href="/img/touchandoroid.png" rel="apple-touch-icon-precomposed">
   
-  <link href='http://fonts.googleapis.com/css?family=Wellfleet' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="css/normalize.css" />
-  
-  <link href="css/jayaga/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/foundation.css" />
-  
-  <link rel="stylesheet" href="css/styles.css" />
-  
-   <link rel="stylesheet" href="css/styleMore.css" />
-
-   <link rel="apple-touch-icon" href="/img/touchandoroid.png">
-
-	<link href="/img/touchandoroid.png" rel="apple-touch-icon-precomposed">
-  
-  <style>
+<style>
    .progress-label {
 		float: left;
 		margin-left: 45%;
@@ -34,10 +35,12 @@
 	}
 	
 	body{
-		zoom: 70%;
-		-moz-transform: scale(0.8);
+	  background-color: #e4e1dd; 
+	  background-image: url('img/background.gif'), url('img/background2.png');
+	  background-repeat: repeat-y, no-repeat;
+	  background-position: center top;
 	}
-	
+
 	.demoHeaders {
 		margin-top: 2em;
 	}
@@ -79,11 +82,8 @@
 	
 	</style>
 
-	<script src="js/vendor/custom.modernizr.js"></script>
-
 </head>
 <body onload="get_value();">
-	<div id="topBanner"></div>
 	<div class="row">
 		<div class="large-12 columns text-center">
 			<div class="logotype"><img src="img/logotype.png" alt="" /></div>
@@ -93,21 +93,23 @@
 	<div class="row">
 		<div class="large-12 columns">
 			<div class="panel">
-				<div id="searchForm">
 					<form method="post" action="">
 						<div class="row">
-							<div class="large-6 columns">
+							<div class="large-5 columns">
 								<div class="ui-widget">
-								<img src="http://cdn.kidscare.se/assets/info-icon.png" onclick="window.open('http://stinsen.yathra.se/#'+fromValue)" hight="25" width="25" />
 								<div class="startIkon inputIcons">
-									<input class="from" type="text" name="fromPlace" id="from" value="" placeholder="Från" x-webkit-speech /> 
+								<input class="from" type="text" name="fromPlace" id="from" value="" placeholder="Från" x-webkit-speech /> 
 								</div>
 								</div>
 							</div>
-							<div class="large-6 columns">
-								<img src="http://cdn.kidscare.se/assets/info-icon.png" onclick="window.open('http://stinsen.yathra.se/#'+toValue)" hight="25" width="25" />
+							<div class="large-5 columns">
 								<div class="finishedIkon inputIcons">
-									<input class="destination" type="text" name="destination" id="destination" value="" placeholder="Till" x-webkit-speech />
+								<input class="destination" type="text" name="destination" id="destination" value="" placeholder="Till" x-webkit-speech />
+								</div>
+							</div>
+							<div class="large-2 columns">
+								<div class="finishedIkon inputIcons">
+								    <div class="button small round" type="button" id="delalink">Dela</div>
 								</div>
 							</div>
 						</div>
@@ -133,22 +135,45 @@
 								</div>
 							</div>
 							<div class="large-2 columns">
-								<div class="button expand" type="button" id="searchbutton">Ta mig dit jag vill!</div>
-								<a href="" id="delalink">Dela sökning</a>
-							</div>
-						</div>
-						<div class="row" id="progressbar">
-							<div class="large-12 columns">
-								<div class="progress-label">Hämtar tider och priser...(max 120 sekunder)</div>
+								<div class="button small round" type="button" id="searchbutton">Sök</div>
 							</div>
 						</div>
 					</form>
-				</div>
 			</div>
 		</div>
-		<div class="row">
-							<div class="large-1 columns">&nbsp;</div>
-							<div class="large-10 columns">
+	</div>
+	<div class="row">
+	    <div class="large-12 columns">
+		  <div class="panel callout text-center hide" id="progressbar" >
+			Hämtar tider och priser...
+		</div>
+	    </div>
+	</div>
+<!-- Sök - Inmatning END -->
+<!-- Result data - START -->
+	<div class="row">
+	    <div class="large-12 columns">
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            <th>Från</th>
+            <th>Avg.</th>
+            <th>Till</th>
+            <th>Ank.</th>
+            <th>Byte</th>
+            <th>Restid</th>
+            <th>Pris.fr.</th>
+        </tr>
+    </thead>
+    <tbody id="alltrips">
+    </tbody>
+</table>
+	      </div>
+	</div>
+<!-- Result data - END -->
+<!-- Infotext - START -->
+	<div class="row">	
+		<div class="large-12 columns">
 							Hämtar priser från: <a href="https://www.arlandaexpress.se">Arlanda Express</a>, 
 												<a href="http://www.dalatrafik.se/">Dalatrafik </a>,
 												<a href="http://www.blekingetrafiken.se/">Blekingetrafiken</a>,
@@ -170,18 +195,11 @@
 												<a href="http://www.ostgotatrafiken.se">Östgötatrafiken</a>.<br /> 
 							Priset baseras på en vuxen med reskassa. <br />
 							Tidtabellen hämtas från <a href="http://www.resrobot.se">Resrobot</a>. Yathra <a href="http://www.trafiklab.se/projekt/yathra">API</a> info. E-Post: <a href="mailto:info@yathra.se">info@yathra.se</a>.
-							</div>
-								<div class="large-1 columns">&nbsp;</div>
 		</div>
 	</div>
-<!-- Sök - Inmatning END -->
-	<div id="searchResult">
-	
+<!-- Infotext - END -->
 
-	</div>
-	
-<script src="js/vendor/jquery-1.7.2.js"></script>
-<script src="Material/Jquery%20Framework/jquery.mobile-1.3.0/jquery-ui.js"></script>
+
 <script src="id-name-muni.js"></script>
 <script src="lanid-kommunid.js"></script>
 
@@ -266,75 +284,25 @@
 	</div>\
 </div><!--<div class="row"><div class="columns large-12">Se detaljerad information</div></div>-->';
 			rader++;
-			$('#searchResult').append('<div class="row" id="ssvar'+rader+'">  \
-			<div class="large-12 columns"> \
-				<div class="oneTrip panel"> \
-					<div class="large-12 columns no-padding"> \
-						<div class="large-8 columns cityTime"> \
-							<div class="row"> \
-								<div class="large-8 columns no-padding"> \
-									<div class="startIkon inputIcons iconsSmall"> \
-										<span class="cityName"> ' + fromString + ' </span> \
-									</div> \
-								</div> \
-								<div class="large-4 columns"> \
-									<span class="resultTime">' + startDeparture + '</span> \
-								</div> \
-							</div> \
-							<div class="row"> \
-								<div class="large-8 columns no-padding"> \
-									<div class="finishedIkon inputIcons iconsSmall"> \
-										<span class="cityName"> ' + toString + '</span> \
-									</div> \
-								</div> \
-								<div class="large-4 columns"> \
-									<span class="resultTime">' + endarrival + '</span> \
-								</div> \
-							</div> \
-						</div> \
-						<div class="large-4 columns"> \
-							<div class="row"> \
-								<div class="columns large-12 small-6"> \
-									<span class="tripInfo">Total restid:</span> \
-									<span class="tripInfoNumber">' + trip.traveltimetotal + '</span> \
-								</div> \
-								<div class="columns large-12 small-6"> \
-									<span class="tripInfo">Antal byten:</span> \
-									<span class="tripInfoNumber">' + byten + ' byten</span> \
-								</div> \
-								<div class="columns large-12"> \
-									<span class="tripInfo">fr. Pris:</span> \
-									<div class="priceTag"> \
-										<div class="priceBefore"></div> \
-										<div class="price"><a href="'+trip.url+'" target="_blank">' + trip.sellername + ':' + trip.price + ' SEK</a></div> \
-										<div class="priceAfter"></div> \
-									</div> \
-								</div> \
-							</div> \
-						</div> \
-					</div> \
-					<img onclick="$(\'#ssvar'+rader+'\').remove();" src="http://icons.iconarchive.com/icons/custom-icon-design/pretty-office-3/48/remove-ticket-icon.png" />\
-				</div> \
-			</div> \
-			<div class="large-12 columns">\
-			<div class="panel moreInfo text-center">\
-			 <div class="showMoreInfo">\
-			 	<div class ="divtoggler">\
-			 	'+ stations +'\
-			 	</div>\
-			 </div>\
-			</div>\
-		   </div>\
-		</div>');
-	 	 
+			
+	$('#table_id').DataTable().row.add( [
+            fromString ,
+            startDeparture,
+            toString,
+            endarrival,
+            byten,
+            trip.traveltimetotal,
+            '<a href="'+trip.url +'" target="_blank">'+ trip.price +' SEK</a>'
+        ] ).draw();
 		};
   
 		$("#searchbutton").click(function() {
 		document.title = "Yathra: " + fromString + " -> " + toString;
 		 $("#progressbar").show();
-	
-		 var query = "avgnr="+avgnr+"&from=" + fromValue + "&to=" + toValue + "&departureDate=" + encodeURI($('#datepicker').attr('value')) + "&departureTime=" + $('#timepicker').attr('value')+ "&arrivalDate=" + encodeURI($('#datepickera').attr('value')) + "&arrivalTime=" + $('#timepickera').attr('value');
-			$('#delalink').attr("href", 'mailto:?subject=Resa från ' + fromString + ' till ' + toString + ' - '+$('#datepicker').attr('value')+'&body=Länk till resan http://www.yathra.se/#'+query.split('&').join('%26')); 
+		 
+		 var query = "avgnr="+avgnr+"&from=" + fromValue + "&to=" + toValue + "&departureDate=" + encodeURI($('#datepicker').val()) + "&departureTime=" + $('#timepicker').val()+ "&arrivalDate=" + encodeURI($('#datepickera').val()) + "&arrivalTime=" + $('#timepickera').val();
+		
+		$('#delalink').attr("href", 'mailto:?subject=Resa från ' + fromString + ' till ' + toString + ' - '+$('#datepicker').val()+'&body=Länk till resan http://www.yathra.se/#'+query.split('&').join('%26')); 
 			window.location.hash = query;
 			
 		  $.get("finder.php", query)
@@ -344,23 +312,12 @@
 				tripData = data;
 				avgnr = avgnr + 1;
 				try {
-				for(var i = tripData.timetableresult.ttitem.length-1 ;i > -1 ;i--)
-				{
-					CreateTrip(tripData.timetableresult.ttitem[i],i);
-				}
-				$('.divtoggler').click(function() {
-						$(this).children("div").toggle('slow', function() {
-					});
-				});
 				
-				if(tripData.timetableresult.ttitem.length > 0){
-				  $("#searchbutton").click();
-				}
-				else{
-				  avgnr = 0;	
-				}
+				CreateTrip(tripData.timetableresult.ttitem[0],0);
+				$("#searchbutton").click();
+
 				} catch (e) {
-				  alert(data.error);
+				avgnr = 0;
 				}
 			});
 		});
@@ -465,20 +422,16 @@
 				$("#searchbutton").click();
 			}			
 		}
-		
-		 $(function() {
-				var progressbar = $("#progressbar"),
-				progressLabel = $( ".progress-label" );
-				progressbar.progressbar({value: false});
-			});
-			
-			$("#progressbar").hide();
-</script>
-
-<script src="js/foundation.min.js"></script>
-  
-<script>
     $(document).foundation();
+var svar_table = $('#table_id').DataTable( {
+      paging: false,
+      searching: false, 
+      language: {
+        info: ""}
+        }
+	);
+svar_table.page.len( -1 ).draw();
+new $.fn.dataTable.ColReorder( svar_table );
 </script>
 
 </body>
