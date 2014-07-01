@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" manifest="offline.php"> <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width" />
+  
+  <script src="js/vendor/modernizr.js"></script>
+  <script src="js/vendor/jquery.js"></script>
+  <script src="js/vendor/jquery-ui.min.js"></script>
+  <script src="js/vendor/fastclick.js"></script>
+  
+  <title>Yathra: Tidtabell med priser för hela Sverige.</title>
+  <script src="js/foundation.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css">
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="js/jquery.dataTables.js"></script>
+<!-- DataTables, colReorder -->
+<script type="text/javascript" charset="utf8" src="js/dataTables.colReorder.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Wellfleet' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/normalize.css" />
+  <link rel="stylesheet" href="css/foundation.css" />
+   <link rel="stylesheet" href="css/jquery-ui.min.css" />
+   <link rel="apple-touch-icon" href="/img/touchandoroid.png">
+   <link href="/img/touchandoroid.png" rel="apple-touch-icon-precomposed">
+  
+  <style>
+   .progress-label {
+		float: left;
+		margin-left: 45%;
+		margin-top: 5px;
+		font-weight: bold;
+		text-shadow: 1px 1px 0 #fff;
+	}
+	
+	body{
+		zoom: 70%;
+		-moz-transform: scale(0.8);
+	}
+	
+	.demoHeaders {
+		margin-top: 2em;
+	}
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
+	}
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
+	}
+	#icons {
+		margin: 0;
+		padding: 0;
+	}
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+	
+	.travelsegment {
+		display: none;
+	}
+	
+	</style>
+
+</head>
+<body onload="get_value();">
+	<div id="topBanner"></div>
+	<div class="row">
+		<div class="large-12 columns text-center">
+			<div class="logotype"><img src="img/logotype.png" alt="" /></div>
+		</div>
+	</div>
+<!-- Sök - Inmatning START -->
+	<div class="row">
+		<div class="large-12 columns">
+			<div class="panel">
+				<div id="searchForm">
+					<form method="post" action="">
+						<div class="row">
+							<div class="large-6 columns">
+								<div class="ui-widget">
+								<img src="http://cdn.kidscare.se/assets/info-icon.png" onclick="window.open('http://stinsen.yathra.se/#'+fromValue)" hight="25" width="25" />
+								<div class="startIkon inputIcons">
+									<input class="from" type="text" name="fromPlace" id="from" value="" placeholder="Från" x-webkit-speech /> 
+								</div>
+								</div>
+							</div>
+							<div class="large-6 columns">
+								<img src="http://cdn.kidscare.se/assets/info-icon.png" onclick="window.open('http://stinsen.yathra.se/#'+toValue)" hight="25" width="25" />
+								<div class="finishedIkon inputIcons">
+									<input class="destination" type="text" name="destination" id="destination" value="" placeholder="Till" x-webkit-speech />
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="large-3 columns">
+								<div class="dateIkon inputIcons">
+									<input type="text" id="datepicker" placeholder="Avg.Datum" />
+								</div>
+							</div>
+							<div class="large-2 columns">
+								<div class="clockIkon inputIcons">
+									<input type="time" id="timepicker" name="" value="" placeholder="Avg.Tid" />
+								</div>
+							</div>
+							<div class="large-3 columns">
+								<div class="dateIkon inputIcons">
+									<input type="text" id="datepickera" placeholder="Ank.Datum" />
+								</div>
+							</div>
+							<div class="large-2 columns">
+								<div class="clockIkon inputIcons">
+									<input type="time" id="timepickera" name="" value="" placeholder="Ank.Tid" />
+								</div>
+							</div>
+							<div class="large-2 columns">
+								<div class="button expand" type="button" id="searchbutton">Ta mig dit jag vill!</div>
+								<a href="" id="delalink">Dela sökning</a>
+							</div>
+						</div>
+						<div class="row" id="progressbar">
+							<div class="large-12 columns">
+								<div class="progress-label">Hämtar tider och priser...(max 120 sekunder)</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+							<div class="large-1 columns">&nbsp;</div>
+							<div class="large-10 columns">
+							Hämtar priser från: <a href="https://www.arlandaexpress.se">Arlanda Express</a>, 
+												<a href="http://www.dalatrafik.se/">Dalatrafik </a>,
+												<a href="http://www.blekingetrafiken.se/">Blekingetrafiken</a>,
+												<a href="http://www.blataget.com">BlåTåget</a>, 
+												<a href="http://www.hlt.se">Hallandstrafiken</a>,
+												<a href="http://www.jlt.se">Jönköpings Länstrafik</a>,
+												<a href="http://www.klt.se/">Kalmar Länstrafik</a>,
+												<a href="http://www.lanstrafikenkron.se/">Länstrafiken Kronoberg</a>,
+												<a href="http://www.masexpressen.se">MasExpressen</a>,
+												<a href="http://www.nettbuss.se">nettbuss</a>, 
+												<a href="http://www.nsb.no">NSB</a>,
+												<a href="http://www.sj.se">SJ</a>,
+												<a href="http://www.skanetrafiken.se">Skånetrafiken</a>, 
+												<a href="http://www.sl.se">SL</a>,
+												<a href="http://www.snalltaget.se">Snälltåget</a>,
+												<a href="http://www.swebus.se">Swebus</a>,
+												<a href="http://www.tagkompaniet.se/">Tågkompaniet</a>,
+												<a href="http://www.vasttrafik.se">Västtrafik</a> och
+												<a href="http://www.ostgotatrafiken.se">Östgötatrafiken</a>.<br /> 
+							Priset baseras på en vuxen med reskassa. <br />
+							Tidtabellen hämtas från <a href="http://www.resrobot.se">Resrobot</a>. Yathra <a href="http://www.trafiklab.se/projekt/yathra">API</a> info. E-Post: <a href="mailto:info@yathra.se">info@yathra.se</a>.
+							</div>
+								<div class="large-1 columns">&nbsp;</div>
+								
+		</div>
+	</div>
+<!-- Sök - Inmatning END -->
+	<div id="searchResult">
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            <th>Från</th>
+            <th>Avg.</th>
+            <th>Till</th>
+            <th>Ank.</th>
+            <th>Byte</th>
+            <th>Restid</th>
+            <th>Pris.fr.</th>
+        </tr>
+    </thead>
+    <tbody id="alltrips">
+        <tr>
+	    <td>Varberg Station</td>
+            <td>2014-07-08 12:00</td>
+            <td>Göteborg Centralstation</td>
+            <td>2014-07-08 12:00</td>
+            <td>0</td>
+            <td>45</td>
+            <td>86.5 SEK</td>
+        </tr>
+    </tbody>
+</table>
+	</div>
+
+<script src="id-name-muni.js"></script>
+<script src="lanid-kommunid.js"></script>
+
+<script type="text/javascript">
+		var avgnr = 0;
+		for (var i = 0; i < allastationer.length; i++){
+			var ut = allastationer.length-i-1;
+			allastationer[ut].label = allastationer[i].n;
+			allastationer[ut].value = allastationer[i].i;
+			var tempscb = "0"+allastationer[i].m;
+			allastationer[ut].scbid = tempscb.substr(tempscb.length - 4);
+		}
+		var rader = 0;
+		var toString;
+		var fromString;
+		
+		CreateTrip = function(trip,currentTrip)
+		{
+			var priceone;
+			var startDeparture;
+			var endarrival;
+			var firstSegment;
+			var lastSegment;
+			var segmentLength = 0;
+			var byten = trip.segment.length;
+			byten = byten - 1;
+			segmentLength = trip.segment.length;
+			firstSegment = trip.segment[0];
+			startDeparture = trip.segment[0].departure.datetime;
+			endarrival = trip.segment[trip.segment.length-1].arrival.datetime;
+			lastSegment = trip.segment[trip.segment.length-1];
+		
+			if(byten > 0 ){
+			priceone = firstSegment.lowestpriceseller.name +':'+ firstSegment.lowestprice +' SEK ->';
+			}
+			else {
+			priceone = "";
+			}
+			if(firstSegment.segmentid.mot.type == "G")
+			{
+			carrier = new Object();
+			carrier.name =  "Gå";
+			firstSegment.segmentid.carrier = carrier;}
+			
+			var stations = 'Mer'+
+'<div class="travelsegment">\
+	<div class="large-12 columns">\
+		<div class="panel moreInformation">\
+				<h6>Reserutt</h6>\
+				<div class="oneStation firstStation">\
+				   <div class="timeBubbleCost">' + firstSegment.departure.datetime.substring(11) + '</div>\
+				   <span class="stationName"><a href="http://stinsen.yathra.se/#'+firstSegment.departure.location.id+'" target="_blank" style="color:white;">' + firstSegment.departure.location.name + "</a><br />" + firstSegment.segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+firstSegment.lowestpriceseller.url +'" target="_blank">'+ priceone +'</a></span>\
+				</div>\
+				<div class="oneBetween">\
+				</div>';
+				
+			for(var i = 1;i < segmentLength;i++)
+			{
+			if(trip.segment[i].segmentid.mot.type == "G")
+			{
+			carrier = new Object();
+			carrier.name =  "Gå";
+			trip.segment[i].segmentid.carrier = carrier;
+			}
+			
+			stations = stations +
+'				<div class="oneStation">\
+       				<div class="timeBubbleCost">' + trip.segment[i-1].arrival.datetime.substring(11) + '</div>\
+       				<div class="timeBubbleCost">' + trip.segment[i].departure.datetime.substring(11) + '</div>\
+       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+trip.segment[i].departure.location.id+'" target="_blank" style="color:white;">' + trip.segment[i].departure.location.name + "</a><br />"  + trip.segment[i].segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +':'+ trip.segment[i].lowestprice +' SEK -></a></span>\
+      			</div>\
+	  			<div class="oneBetween">\
+      			</div>';
+			}
+			
+		stations = stations + 
+'				<div class="oneStation lastStation">\
+       				<div class="timeBubbleCost">' + lastSegment.arrival.datetime.substring(11) + '</div>\
+       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+lastSegment.arrival.location.id+'" target="_blank" style="color:white;">' + lastSegment.arrival.location.name + '</a></span>\
+      			</div>\
+	 	</div>\
+	</div>\
+</div><!--<div class="row"><div class="columns large-12">Se detaljerad information</div></div>-->';
+			rader++;
+			$('#alltrips').append('<tr> \
+	    <td>' + fromString + '</td> \
+            <td>' + startDeparture + '</td> \
+            <td>' + toString + '</td> \
+            <td>' + endarrival + '</td> \
+            <td>' + byten + '</td> \
+            <td>' + trip.traveltimetotal + '</td> \
+            <td>' + trip.price + ' SEK</td> \
+        </tr>');
+        svar_table.draw();
+		};
+  
+		$("#searchbutton").click(function() {
+		document.title = "Yathra: " + fromString + " -> " + toString;
+		 $("#progressbar").show();
+	
+		 var query = "avgnr="+avgnr+"&from=" + fromValue + "&to=" + toValue + "&departureDate=" + encodeURI($('#datepicker').attr('value')) + "&departureTime=" + $('#timepicker').attr('value')+ "&arrivalDate=" + encodeURI($('#datepickera').attr('value')) + "&arrivalTime=" + $('#timepickera').attr('value');
+			$('#delalink').attr("href", 'mailto:?subject=Resa från ' + fromString + ' till ' + toString + ' - '+$('#datepicker').attr('value')+'&body=Länk till resan http://www.yathra.se/#'+query.split('&').join('%26')); 
+			window.location.hash = query;
+			
+		  $.get("finder.php", query)
+			.done(function(data)
+			{
+				$("#progressbar").hide();
+				tripData = data;
+				avgnr = avgnr + 1;
+				try {
+				for(var i = tripData.timetableresult.ttitem.length-1 ;i > -1 ;i--)
+				{
+					CreateTrip(tripData.timetableresult.ttitem[i],i);
+				}
+				$('.divtoggler').click(function() {
+						$(this).children("div").toggle('slow', function() {
+					});
+				});
+				
+				if(tripData.timetableresult.ttitem.length > 0){
+				  $("#searchbutton").click();
+				}
+				else{
+				  avgnr = 0;	
+				}
+				} catch (e) {
+				  alert(data.error);
+				}
+			});
+		});
+		
+		var fromValue;
+		var toValue;
+		
+		
+		var fromnames = [];
+		var destinationnames = [];
+		var fromIds = [];
+		var destinationids = [];
+		var fromAutoCompleted = false;
+		var toAutoCompleted = false;
+		
+		$("#datepicker").datepicker({ dateFormat: 'yy-mm-dd',numberOfMonths: 3, minDate: -0, maxDate: +60, showWeek: true, firstDay: 1});
+		$("#datepickera").datepicker({ dateFormat: 'yy-mm-dd',numberOfMonths: 3, minDate: -0, maxDate: +60, showWeek: true, firstDay: 1});
+		
+		
+		$( "#from" ).autocomplete({
+      minLength: 2,
+      source: function(request, response) {
+        var results = $.ui.autocomplete.filter(allastationer, request.term);
+
+        response(results.slice(0, 10));
+    },
+      focus: function( event, ui ) {
+        $( "#from" ).val( ui.item.label );
+        return false;
+      },
+      select: function( event, ui ) {
+        $( "#from" ).val( ui.item.label );
+        fromValue = ui.item.value;
+        fromString = ui.item.label;
+        return false;
+      }
+    })
+    .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+      return $( "<li>" )
+        .append( "<a><b>" + item.label + "</b><br>" + kommun[item.scbid] + ", " + lan[item.scbid.substr(0,2)]+ "</a>" )
+        .appendTo( ul );
+    };
+    
+    $( "#destination" ).autocomplete({
+      minLength: 2,
+      source: function(request, response) {
+        var results = $.ui.autocomplete.filter(allastationer, request.term);
+
+        response(results.slice(0, 10));
+    },
+      focus: function( event, ui ) {
+        $( "#destination" ).val( ui.item.label );
+        return false;
+      },
+      select: function( event, ui ) {
+        $( "#destination" ).val( ui.item.label );
+        toValue = ui.item.value;
+        toString = ui.item.label;
+        return false;
+      }
+    })
+    .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+      return $( "<li>" )
+        .append( "<a><b>" + item.label + "</b><br>" + kommun[item.scbid] + ", " + lan[item.scbid.substr(0,2)]+ "</a>" )
+        .appendTo( ul );
+    };
+    
+		function get_value(){
+			var urldelar = decodeURIComponent(window.location).split("#");
+			_GET = new Array();
+			if (urldelar[1] != undefined){
+				urldelar = urldelar[1].split("&");
+				for (var i=0;i<urldelar.length;i++){
+   					 var pair = urldelar[i].split("=");
+      					_GET[pair[0]] = pair[1];
+    				}
+			}
+			
+			$("#datepicker").val(_GET["departureDate"]);
+			$("#timepicker").val(_GET["departureTime"]);
+			$("#datepickera").val(_GET["arrivalDate"]);
+			$("#timepickera").val(_GET["arrivalTime"]);
+
+			var firstdone = false;
+			var secondone = false;
+			fromValue = _GET["from"];
+			toValue = _GET["to"];
+			
+			for (var i = 0; i < allastationer.length; i++){
+				if(allastationer[i].value == _GET["from"]){
+					$("#from").val(allastationer[i].label);
+					fromString=allastationer[i].label;
+					firstdone = true;
+				}
+				if(allastationer[i].value == _GET["to"]){
+					$("#destination").val(allastationer[i].label);
+					toString = allastationer[i].label;
+					secondone = true;
+				}
+			}
+			if(firstdone ==  true && secondone == true){
+				$("#searchbutton").click();
+			}			
+		}
+		
+		 $(function() {
+				var progressbar = $("#progressbar"),
+				progressLabel = $( ".progress-label" );
+				progressbar.progressbar({value: false});
+			});
+			
+			$("#progressbar").hide();
+
+    $(document).foundation();
+    $(document).ready( function () {
+    var svar_table = $('#table_id').DataTable( {
+      paging: false,
+      searching: false, 
+      language: {
+        info: ""}
+        }
+      );
+    svar_table.page.len( -1 ).draw();
+    new $.fn.dataTable.ColReorder( svar_table );
+} );
+</script>
+
+</body>
+</html>
