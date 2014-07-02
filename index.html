@@ -80,6 +80,24 @@
 		display: none;
 	}
 	
+	a.kopa:link {
+	  color: #00790e;
+	}
+
+	a.kopa:visited {
+	  color: #00790e;
+	}
+	
+	a.radera:link {
+	  color: #7e1212;
+	}
+
+	a.radera:visited {
+	  color: #7e1212;
+	}	
+	div.logotype {
+	  padding: 24px;
+	}
 	</style>
 
 </head>
@@ -163,6 +181,7 @@
             <th>Byte</th>
             <th>Restid</th>
             <th>Pris.fr.</th>
+            <th><a href="javascript:void(0)" onclick="$('#table_id').DataTable().clear();$('#table_id').DataTable().draw();">Tömm</a></th>
         </tr>
     </thead>
     <tbody id="alltrips">
@@ -174,6 +193,7 @@
 <!-- Infotext - START -->
 	<div class="row">	
 		<div class="large-12 columns">
+		      <div class="panel">
 							Hämtar priser från: <a href="https://www.arlandaexpress.se">Arlanda Express</a>, 
 												<a href="http://www.dalatrafik.se/">Dalatrafik </a>,
 												<a href="http://www.blekingetrafiken.se/">Blekingetrafiken</a>,
@@ -195,10 +215,10 @@
 												<a href="http://www.ostgotatrafiken.se">Östgötatrafiken</a>.<br /> 
 							Priset baseras på en vuxen med reskassa. <br />
 							Tidtabellen hämtas från <a href="http://www.resrobot.se">Resrobot</a>. Yathra <a href="http://www.trafiklab.se/projekt/yathra">API</a> info. E-Post: <a href="mailto:info@yathra.se">info@yathra.se</a>.
+			</div>
 		</div>
 	</div>
 <!-- Infotext - END -->
-
 
 <script src="id-name-muni.js"></script>
 <script src="lanid-kommunid.js"></script>
@@ -244,10 +264,8 @@
 			carrier.name =  "Gå";
 			firstSegment.segmentid.carrier = carrier;}
 			
-			var stations = 'Mer'+
-'<div class="travelsegment">\
-	<div class="large-12 columns">\
-		<div class="panel moreInformation">\
+			var stations = '<div clss="row">\
+			<div class="large-12 columns">\
 				<h6>Reserutt</h6>\
 				<div class="oneStation firstStation">\
 				   <div class="timeBubbleCost">' + firstSegment.departure.datetime.substring(11) + '</div>\
@@ -280,11 +298,12 @@
        				<div class="timeBubbleCost">' + lastSegment.arrival.datetime.substring(11) + '</div>\
        				<span class="stationName"><a href="http://stinsen.yathra.se/#'+lastSegment.arrival.location.id+'" target="_blank" style="color:white;">' + lastSegment.arrival.location.name + '</a></span>\
       			</div>\
-	 	</div>\
 	</div>\
-</div><!--<div class="row"><div class="columns large-12">Se detaljerad information</div></div>-->';
+</div>';
 			rader++;
 			
+			var modalid = 'myModalID'+Math.random();
+			modalid = modalid.replace('.','');
 	$('#table_id').DataTable().row.add( [
             fromString ,
             startDeparture,
@@ -292,10 +311,17 @@
             endarrival,
             byten,
             trip.traveltimetotal,
-            '<a href="'+trip.url +'" target="_blank">'+ trip.price +' SEK</a>'
+            trip.price,
+            '<a href="'+trip.url +'" target="_blank" class="kopa">Köp</a>\
+            <a href="javascript:void(0)" onclick="$(\'#'+modalid+'\').foundation(\'reveal\', \'open\');">Visa</a>\
+            <a class="delete radera" href="javascript:void(0)">Radera</a> \
+            <div id="'+modalid+'" class="reveal-modal" data-reveal> '+stations+' <a class="close-reveal-modal">&#215;</a></div>'
         ] ).draw();
 		};
-  
+		
+	
+	    
+
 		$("#searchbutton").click(function() {
 		document.title = "Yathra: " + fromString + " -> " + toString;
 		 $("#progressbar").show();
@@ -427,11 +453,49 @@ var svar_table = $('#table_id').DataTable( {
       paging: false,
       searching: false, 
       language: {
-        info: ""}
+        info: "",
+        infoEmpty:"",
+        zeroRecords:"Inga resor hämtade."}
         }
 	);
 svar_table.page.len( -1 ).draw();
 new $.fn.dataTable.ColReorder( svar_table );
+
+svar_table.on( 'click', 'a.delete', function () {
+    $('#table_id').DataTable()
+        .row( $(this).parents('tr') )
+        .remove()
+        .draw();
+} );
+
+// implement JSON.stringify serialization
+JSON.stringify = JSON.stringify || function (obj) {
+
+	var t = typeof (obj);
+	if (t != "object" || obj === null) {
+
+		// simple data type
+		if (t == "string") obj = '"'+obj+'"';
+		return String(obj);
+
+	}
+	else {
+
+		// recurse array or object
+		var n, v, json = [], arr = (obj && obj.constructor == Array);
+
+		for (n in obj) {
+			v = obj[n]; t = typeof(v);
+
+			if (t == "string") v = '"'+v+'"';
+			else if (t == "object" && v !== null) v = JSON.stringify(v);
+
+			json.push((arr ? "" : '"' + n + '":') + String(v));
+		}
+
+		return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+	}
+};
 </script>
 
 </body>
