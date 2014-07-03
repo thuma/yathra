@@ -109,25 +109,20 @@
 	</div>
 <!-- Sök - Inmatning START -->
 	<div class="row">
-		<div class="large-12 columns">
+		<div class="small-12 columns">
 			<div class="panel">
 					<form method="post" action="">
 						<div class="row">
-							<div class="large-5 columns">
+							<div class="large-6 columns">
 								<div class="ui-widget">
 								<div class="startIkon inputIcons">
 								<input class="from" type="text" name="fromPlace" id="from" value="" placeholder="Från" x-webkit-speech /> 
 								</div>
 								</div>
 							</div>
-							<div class="large-5 columns">
+							<div class="large-6 columns">
 								<div class="finishedIkon inputIcons">
 								<input class="destination" type="text" name="destination" id="destination" value="" placeholder="Till" x-webkit-speech />
-								</div>
-							</div>
-							<div class="large-2 columns">
-								<div class="finishedIkon inputIcons">
-								    <div class="button small round" type="button" id="delalink">Dela</div>
 								</div>
 							</div>
 						</div>
@@ -137,7 +132,7 @@
 									<input type="text" id="datepicker" placeholder="Avg.Datum" />
 								</div>
 							</div>
-							<div class="large-2 columns">
+							<div class="large-3 columns">
 								<div class="clockIkon inputIcons">
 									<input type="time" id="timepicker" name="" value="" placeholder="Avg.Tid" />
 								</div>
@@ -147,14 +142,23 @@
 									<input type="text" id="datepickera" placeholder="Ank.Datum" />
 								</div>
 							</div>
-							<div class="large-2 columns">
+							<div class="large-3 columns">
 								<div class="clockIkon inputIcons">
 									<input type="time" id="timepickera" name="" value="" placeholder="Ank.Tid" />
 								</div>
 							</div>
-							<div class="large-2 columns">
-								<div class="button small round" type="button" id="searchbutton">Sök</div>
+						</div>
+						<div class="row">
+							<div class="large-4 columns text-center">
+							    <div class="button small round" type="button" id="delalink" onclick="alert('Här är en url till dina resor: '+window.location)" >Dela tider och priser</div>
 							</div>
+							<div class="large-4 columns text-center">
+							    <div class="button small round" type="button" id="clearbutton" onclick="$('#table_id').DataTable().clear();$('#table_id').DataTable().draw();" >Radera alla resor i tabellen</div>
+							</div>
+							<div class="large-4 columns text-center">
+							    <div class="button small round" type="button" id="searchbutton">Hämta tider och priser</div>
+							</div>
+
 						</div>
 					</form>
 			</div>
@@ -181,7 +185,7 @@
             <th>Byte</th>
             <th>Restid</th>
             <th>Pris.fr.</th>
-            <th><a href="javascript:void(0)" onclick="$('#table_id').DataTable().clear();$('#table_id').DataTable().draw();">Tömm</a></th>
+            <th>&nbsp;</th>
         </tr>
     </thead>
     <tbody id="alltrips">
@@ -219,6 +223,37 @@
 		</div>
 	</div>
 <!-- Infotext - END -->
+
+
+<div class="row">	
+	<div class="large-12 columns">
+		<div class="panel">
+		    <div class="row">
+			<div class="large-2 columns startStation">
+			    Varberg Station
+			</div>
+			<div class="large-1 columns tripDeparture">
+			  Mån V31, 21 Jun 12:00
+			</div>
+			<div class="large-2 columns operator">
+			Öresundståg
+			</div>
+			<div class="large-2 columns price">
+			86.5 SEK Skånetrafiken<br />
+			109 SEK SJ
+			</div>
+			<div class="large-2 columns tripType">
+			Tåg, X31
+			</div>		
+			<div class="large-1 columns arrival">
+			 Mån V31, 21 Jun 20:30 
+			</div>
+			<div class="large-2 columns endStation">
+			Malmö Centralstation
+			</div>
+		</div>
+	</div>
+</div>		      
 
 <script src="id-name-muni.js"></script>
 <script src="lanid-kommunid.js"></script>
@@ -269,9 +304,7 @@
 				<h6>Reserutt</h6>\
 				<div class="oneStation firstStation">\
 				   <div class="timeBubbleCost">' + firstSegment.departure.datetime.substring(11) + '</div>\
-				   <span class="stationName"><a href="http://stinsen.yathra.se/#'+firstSegment.departure.location.id+'" target="_blank" style="color:white;">' + firstSegment.departure.location.name + "</a><br />" + firstSegment.segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+firstSegment.lowestpriceseller.url +'" target="_blank">'+ priceone +'</a></span>\
-				</div>\
-				<div class="oneBetween">\
+				   <span class="stationName"><a href="http://stinsen.yathra.se/#'+firstSegment.departure.location.id+'" target="_blank">' + firstSegment.departure.location.name + "</a><br />" + firstSegment.segmentid.carrier.name + '<br /><a href="'+firstSegment.lowestpriceseller.url +'" target="_blank">'+ priceone +'</a></span>\
 				</div>';
 				
 			for(var i = 1;i < segmentLength;i++)
@@ -287,7 +320,7 @@
 '				<div class="oneStation">\
        				<div class="timeBubbleCost">' + trip.segment[i-1].arrival.datetime.substring(11) + '</div>\
        				<div class="timeBubbleCost">' + trip.segment[i].departure.datetime.substring(11) + '</div>\
-       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+trip.segment[i].departure.location.id+'" target="_blank" style="color:white;">' + trip.segment[i].departure.location.name + "</a><br />"  + trip.segment[i].segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +':'+ trip.segment[i].lowestprice +' SEK -></a></span>\
+       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+trip.segment[i].departure.location.id+'" target="_blank">' + trip.segment[i].departure.location.name + "</a><br />"  + trip.segment[i].segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +':'+ trip.segment[i].lowestprice +' SEK -></a></span>\
       			</div>\
 	  			<div class="oneBetween">\
       			</div>';
@@ -296,7 +329,7 @@
 		stations = stations + 
 '				<div class="oneStation lastStation">\
        				<div class="timeBubbleCost">' + lastSegment.arrival.datetime.substring(11) + '</div>\
-       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+lastSegment.arrival.location.id+'" target="_blank" style="color:white;">' + lastSegment.arrival.location.name + '</a></span>\
+       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+lastSegment.arrival.location.id+'" target="_blank">' + lastSegment.arrival.location.name + '</a></span>\
       			</div>\
 	</div>\
 </div>';
@@ -337,6 +370,15 @@
 				$("#progressbar").hide();
 				tripData = data;
 				avgnr = avgnr + 1;
+				try {
+				data = tripData.error;
+				if(data.length > 4){
+				  alert(tripData.error);
+				}
+				}
+				catch(e){
+				ok = 1;
+				}
 				try {
 				
 				CreateTrip(tripData.timetableresult.ttitem[0],0);
