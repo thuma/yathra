@@ -225,27 +225,42 @@
 <!-- Infotext - END -->
 
 
-<div class="row">	
+<div class="row hide">	
 	<div class="large-12 columns">
 		<div class="panel">
+		    <div class="row">
+		     <div class="large-2 columns startStation">
+			    Varberg Station
+			</div>
+			<div class="large-2 columns tripDeparture">
+			  Mån V31, 21 Jun 12:00
+			</div>
+			<div class="large-4 columns price">
+			86.5 SEK Skånetrafiken<br />
+			109 SEK SJ
+			</div>	
+			<div class="large-2 columns arrival">
+			 Mån V31, 21 Jun 20:30 
+			</div>
+			<div class="large-2 columns endStation">
+			Malmö Centralstation
+			</div>
+		    </div>
 		    <div class="row">
 			<div class="large-2 columns startStation">
 			    Varberg Station
 			</div>
-			<div class="large-1 columns tripDeparture">
+			<div class="large-2 columns tripDeparture">
 			  Mån V31, 21 Jun 12:00
 			</div>
-			<div class="large-2 columns operator">
+			<div class="large-2 columns product">
 			Öresundståg
 			</div>
 			<div class="large-2 columns price">
 			86.5 SEK Skånetrafiken<br />
 			109 SEK SJ
-			</div>
-			<div class="large-2 columns tripType">
-			Tåg, X31
-			</div>		
-			<div class="large-1 columns arrival">
+			</div>	
+			<div class="large-2 columns arrival">
 			 Mån V31, 21 Jun 20:30 
 			</div>
 			<div class="large-2 columns endStation">
@@ -288,7 +303,7 @@
 			lastSegment = trip.segment[trip.segment.length-1];
 		
 			if(byten > 0 ){
-			priceone = firstSegment.lowestpriceseller.name +':'+ firstSegment.lowestprice +' SEK ->';
+			priceone = firstSegment.lowestpriceseller.name +':'+ firstSegment.lowestprice +' SEK';
 			}
 			else {
 			priceone = "";
@@ -299,15 +314,49 @@
 			carrier.name =  "Gå";
 			firstSegment.segmentid.carrier = carrier;}
 			
-			var stations = '<div clss="row">\
-			<div class="large-12 columns">\
-				<h6>Reserutt</h6>\
-				<div class="oneStation firstStation">\
-				   <div class="timeBubbleCost">' + firstSegment.departure.datetime.substring(11) + '</div>\
-				   <span class="stationName"><a href="http://stinsen.yathra.se/#'+firstSegment.departure.location.id+'" target="_blank">' + firstSegment.departure.location.name + "</a><br />" + firstSegment.segmentid.carrier.name + '<br /><a href="'+firstSegment.lowestpriceseller.url +'" target="_blank">'+ priceone +'</a></span>\
-				</div>';
-				
-			for(var i = 1;i < segmentLength;i++)
+			var stations = '<div class="row"><div class="large-12 columns text-center"><h2>Reseinformation</h2></div></div>\
+			<div class="row">\
+		     <div class="large-2 columns startStation">\
+			    <a href="http://stinsen.yathra.se/#'+firstSegment.departure.location.id+'" target="_blank">' + firstSegment.departure.location.name + '</a>\
+			</div>\
+			<div class="large-2 columns tripDeparture">\
+			'+firstSegment.departure.datetime.substring(11)+'\
+			</div>\
+			<div class="large-4 columns price text-center">\
+			'+trip.sellername+' <a href="'+trip.url +'" target="_blank">'+ trip.price +' SEK</a>\
+			</div>\
+			<div class="large-2 columns arrival">\
+			'+lastSegment.arrival.datetime.substring(11)+'\
+			</div>\
+			<div class="large-2 columns endStation">\
+			<a href="http://stinsen.yathra.se/#' + lastSegment.arrival.location.id + '" target="_blank">' + lastSegment.arrival.location.name + '</a>\
+			</div>\
+		    </div><div class="row"><div class="large-2 columns startStation">&nbsp;</div></div>\
+		    <div class="row"><div class="large-12 columns"><h3>Resrutt:</h3></div></div>\
+		    <div class="row"><div class="large-2 columns startStation">&nbsp;</div></div>';
+		    
+		    stations = stations + '<div class="row">\
+			<div class="large-2 columns startStation">\
+			Från:\
+			</div>\
+			<div class="large-2 columns tripDeparture">\
+			 Avgång:\
+			</div>\
+			<div class="large-2 columns product">\
+			Transportmedel:\
+			</div>\
+			<div class="large-2 columns price">\
+			Priser:\
+			</div>	\
+			<div class="large-2 columns arrival">\
+			Ankomst:\
+			</div>\
+			<div class="large-2 columns endStation">\
+			Till:\
+			</div>\
+		</div><div class="row"><div class="large-2 columns startStation">&nbsp;</div></div>';
+		    
+			for(var i = 0;i < segmentLength;i++)
 			{
 			if(trip.segment[i].segmentid.mot.type == "G")
 			{
@@ -316,23 +365,28 @@
 			trip.segment[i].segmentid.carrier = carrier;
 			}
 			
-			stations = stations +
-'				<div class="oneStation">\
-       				<div class="timeBubbleCost">' + trip.segment[i-1].arrival.datetime.substring(11) + '</div>\
-       				<div class="timeBubbleCost">' + trip.segment[i].departure.datetime.substring(11) + '</div>\
-       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+trip.segment[i].departure.location.id+'" target="_blank">' + trip.segment[i].departure.location.name + "</a><br />"  + trip.segment[i].segmentid.carrier.name + '<br /><a style="background-color:white;" href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +':'+ trip.segment[i].lowestprice +' SEK -></a></span>\
-      			</div>\
-	  			<div class="oneBetween">\
-      			</div>';
+			stations = stations + '<div class="row">\
+			<div class="large-2 columns startStation">\
+			    <a href="http://stinsen.yathra.se/#'+trip.segment[i].departure.location.id+'" target="_blank">' + trip.segment[i].departure.location.name + '</a>\
+			</div>\
+			<div class="large-2 columns tripDeparture">\
+			 '+trip.segment[i].departure.datetime.substring(11)+'\
+			</div>\
+			<div class="large-2 columns product">\
+			'+ trip.segment[i].segmentid.carrier.name +'\
+			</div>\
+			<div class="large-2 columns price">\
+			<a href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +':'+ trip.segment[i].lowestprice +' SEK</a>\
+			</div>	\
+			<div class="large-2 columns arrival">\
+			 '+trip.segment[i].arrival.datetime.substring(11)+' \
+			</div>\
+			<div class="large-2 columns endStation">\
+			<a href="http://stinsen.yathra.se/#'+trip.segment[i].arrival.location.id+'" target="_blank">' + trip.segment[i].arrival.location.name + '</a>\
+			</div>\
+		</div><div class="row"><div class="large-2 columns startStation">&nbsp;</div></div>';
 			}
-			
-		stations = stations + 
-'				<div class="oneStation lastStation">\
-       				<div class="timeBubbleCost">' + lastSegment.arrival.datetime.substring(11) + '</div>\
-       				<span class="stationName"><a href="http://stinsen.yathra.se/#'+lastSegment.arrival.location.id+'" target="_blank">' + lastSegment.arrival.location.name + '</a></span>\
-      			</div>\
-	</div>\
-</div>';
+
 			rader++;
 			
 			var modalid = 'myModalID'+Math.random();
@@ -380,11 +434,11 @@
 				catch(e){
 				ok = 1;
 				}
-				try {
+			
 				
+				try {
 				CreateTrip(tripData.timetableresult.ttitem[0],0);
 				$("#searchbutton").click();
-
 				} catch (e) {
 				avgnr = 0;
 				}
