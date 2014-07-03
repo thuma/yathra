@@ -10,9 +10,9 @@
   <script src="js/vendor/jquery.js"></script>
   <script src="js/vendor/jquery-ui.min.js"></script>
   <script src="js/vendor/fastclick.js"></script>
-  
-  <title>Yathra: Tidtabell med priser för hela Sverige.</title>
+  <script src="js/ion.sound.min.js"></script>
   <script src="js/foundation.min.js"></script>
+  <title>Yathra: Tidtabell med priser för hela Sverige.</title>
   <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css">
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="js/jquery.dataTables.js"></script>
@@ -368,6 +368,7 @@
 			.done(function(data)
 			{
 				$("#progressbar").hide();
+				$.ionSound.play("water_droplet");
 				tripData = data;
 				avgnr = avgnr + 1;
 				try {
@@ -538,7 +539,19 @@ JSON.stringify = JSON.stringify || function (obj) {
 		return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
 	}
 };
+
+// Start sound
+        $.ionSound({
+            sounds: [
+                "water_droplet"
+            ],
+            path: "sounds/",
+            multiPlay: true,
+            volume: "1.0"
+        });
+
 </script>
+
 
 </body>
 </html>
