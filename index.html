@@ -421,6 +421,7 @@
 		  $.get("finder.php", query)
 			.done(function(data)
 			{
+				end = false;
 				$("#progressbar").hide();
 				$.ionSound.play("water_droplet");
 				tripData = data;
@@ -429,19 +430,15 @@
 				data = tripData.error;
 				if(data.length > 4){
 				  alert(tripData.error);
+				  avgnr = 0;
 				}
 				}
 				catch(e){
-				ok = 1;
+				  CreateTrip(tripData.timetableresult.ttitem[0],0);
+				  $("#searchbutton").click();
 				}
-			
 				
-				try {
-				CreateTrip(tripData.timetableresult.ttitem[0],0);
-				$("#searchbutton").click();
-				} catch (e) {
-				avgnr = 0;
-				}
+
 			});
 		});
 		

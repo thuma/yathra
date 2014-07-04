@@ -43,61 +43,6 @@ if(file_exists('findercache/'.$cachefile)){
 	}
 }
 
-// Make search url:
-$url = 'https://api.trafiklab.se/samtrafiken/resrobot/Search.json'.
-  '?apiVersion=2.1'.
-  '&coordSys=WGS84'.
-  '&fromId='.$_GET['from'].
-  '&toId='.$_GET['to'].
-  '&date='.$_GET['departureDate'].
-  '&time='.urlencode($_GET['departureTime']).
-  '&searchType=F'.
-  '&arrival=false'.
-  '&key='.file_get_contents('../resrobot.key');
-$md5url = md5($url);
-
-/*
-&searchType
-F Standard search. ResRobot will find the fastest trip using all possible transport modes.
-T Train and local public transport. Express buses are not included in the search.
-B Express bus and local public transport. Regional trains and speed trains are not included in the search.
-*/
-
-/*
-'&mode1=true'. //Speed train. X2000 and Arlanda Express
-'&mode2=true'. //Train (except speed trains)
-'&mode3=true'. //Bus (except express buses)
-'&mode4=ture'. //Boat
-'&mode5=ture'); //Express bus
-*/
-
-$run = true;
-if(file_exists('findercache/'.$md5url)){
-	$nu = filemtime('findercache/'.$md5url);
-	if(microtime(true)-$nu<10000){
-		$resultobject = json_decode(file_get_contents('findercache/'.$md5url));
-	 	$run = false;
-	}
-}
-
-if($run){
-  // Run search:
-  $ch = curl_init($url);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  $resultstring = curl_exec($ch);
-  curl_close($ch);
-  
-    //remove specialChars and make object:
-	$resultstring = str_replace('"#','"',$resultstring);
-	$resultstring = str_replace('"@','"',$resultstring);
-	$resultobject = json_decode(utf8_encode($resultstring));
-  	file_put_contents('findercache/'.$md5url, json_encode($resultobject));
-}
-
-if(isset($_GET['debugg'])){
-  print 'Tidtabellsdata: ';
-  print_r($resultobject);
-}
 
 // Generate out object:
 $outobject = new stdClass;
@@ -105,11 +50,18 @@ $outobject->totaltimeaftercache = microtime(true) - $start;
 $outobject->timetableresult = new stdClass;
 $outobject->timetableresult->ttitem = array();
 
-// Generator object $visa 3 results;
+// Set start time.
 $outobject->totaltimeafterreqtotr = microtime(true) - $start;
 $i = 0;
 
-// Loop max 3 hits:
+while(true){
+
+// Get trips from timetable.
+$resultobject = gettimetable($_GET['departureDate']);
+
+// Chek all trips
+$found = false;
+$numberfound = false;
 foreach($resultobject->timetableresult->ttitem as &$trip){
 	if(is_array($trip->segment) == false){
   	  $trip->segment = array($trip->segment);
@@ -121,20 +73,28 @@ foreach($resultobject->timetableresult->ttitem as &$trip){
 	&&
 	strtotime($sista->arrival->datetime) <= strtotime($_GET["arrivalDate"].'T'.$_GET['arrivalTime'])
 	){
-	
 	 if($i == $_GET['avgnr']){
 	    $outobject->timetableresult->ttitem[0] = $trip;
+	    $numberfound = true;
 	 }
-  		$i++;
+	 $found = true;
+	 $i++;
   	}
 }
 
-//print_r($resultobject);
-
-if($i==0){
-	die('{"error":"No trips found in time interval"}');
+if($found == false){
+  die('{"error":"No trips found in time interval"}');
+}
+if($numberfound == false){
+  $_GET['departureTime'] = substr($sista->departure->datetime,11);
+  $_GET['departureDate'] = substr($sista->departure->datetime,0,10);
 }
 
+else{
+  break;
+}
+
+}
 
 // Get alla agencys:
 $agency = file_get_contents('agency.txt');
@@ -220,33 +180,6 @@ $sellers["XTR"][0] 		= "http://api.yathra.se:8800/xtr/?";
 $sellers["KLT"][0] 		= "http://api.yathra.se:8800/klt/?";
 $sellers["MAS"][0] 		= "http://api.yathra.se:8800/mas/?";
 $sellers["SL"][0] 		= "http://api1.yathra.se/prisAPI/sl.php?";
-/*$sellers["VT"][1] 	= "http://api1.yathra.se/prisAPI/vt.php?";
-$sellers["BT"][1]		= "http://api1.yathra.se/prisAPI/bt.php?";
-$sellers["NSB"][1] 		= "http://api1.yathra.se/prisAPI/nsb.php?";
-$sellers["AEX"][1] 		= "http://api1.yathra.se/prisAPI/at.php?";
-$sellers["OT"][1] 		= "http://api1.yathra.se/prisAPI/ot.php?";
-$sellers["NETTBUSS"][1] = "http://api1.yathra.se/prisAPI/nettbuss.php?";
-$sellers["SL"][1] 		= "http://api1.yathra.se/prisAPI/sl.php?";
-$sellers["SJ"][1] 		= "http://[2001:16d8:ff00:125::2]:8800/sj/?";
-$sellers["HLT"][1] 		= "http://[2001:16d8:ff00:125::2]:8800/hlt/?";
-$sellers["SKTR"][1] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
-$sellers["SWEBUS"][1] 	= "http://api1.yathra.se/prisAPI/swebus.php?";
-$sellers["TIB"][1] 		= "http://api1.yathra.se/prisAPI/tib.php?";
-$sellers["Snt"][1] 		= "http://[2001:16d8:ff00:125::2]:8800/snalltaget/?";
-$sellers["VT"][2] 		= "http://api1.yathra.se/prisAPI/vt.php?";
-$sellers["BT"][2]		= "http://api1.yathra.se/prisAPI/bt.php?";
-$sellers["NSB"][2] 		= "http://api1.yathra.se/prisAPI/nsb.php?";
-$sellers["AEX"][2] 		= "http://api1.yathra.se/prisAPI/at.php?";
-$sellers["OT"][2] 		= "http://api1.yathra.se/prisAPI/ot.php?";
-$sellers["NETTBUSS"][2] = "http://api1.yathra.se/prisAPI/nettbuss.php?";
-$sellers["SL"][2] 		= "http://api1.yathra.se/prisAPI/sl.php?";
-$sellers["SJ"][2] 		= "http://[2001:16d8:ff00:2cb::2]:8800/sj/?";
-$sellers["HLT"][2] 		= "http://[2001:16d8:ff00:2cb::2]:8800/hlt/?";
-$sellers["SKTR"][2] 	= "http://api1.yathra.se/prisAPI/sktr.php?";
-$sellers["SWEBUS"][2] 	= "http://api1.yathra.se/prisAPI/swebus.php?";
-$sellers["TIB"][2] 		= "http://api1.yathra.se/prisAPI/tib.php?";
-$sellers["Snt"][2] 		= "http://[2001:16d8:ff00:2cb::2]:8800/snalltaget/?";
-*/
 
 //create the multiple cURL handle
 $curlmultihande = curl_multi_init();
@@ -394,4 +327,62 @@ print json_encode($outobject);
 file_put_contents('findercache/'.$cachefile, json_encode($outobject));
 
 print "\n";
+
+function gettimetable(){
+// Make search url:
+$url = 'https://api.trafiklab.se/samtrafiken/resrobot/Search.json'.
+  '?apiVersion=2.1'.
+  '&coordSys=WGS84'.
+  '&fromId='.$_GET['from'].
+  '&toId='.$_GET['to'].
+  '&date='.$_GET['departureDate'].
+  '&time='.urlencode($_GET['departureTime']).
+  '&searchType=F'.
+  '&arrival=false'.
+  '&key='.file_get_contents('../resrobot.key');
+$md5url = md5($url);
+
+/*
+&searchType
+F Standard search. ResRobot will find the fastest trip using all possible transport modes.
+T Train and local public transport. Express buses are not included in the search.
+B Express bus and local public transport. Regional trains and speed trains are not included in the search.
+*/
+
+/*
+'&mode1=true'. //Speed train. X2000 and Arlanda Express
+'&mode2=true'. //Train (except speed trains)
+'&mode3=true'. //Bus (except express buses)
+'&mode4=ture'. //Boat
+'&mode5=ture'); //Express bus
+*/
+
+if(file_exists('findercache/'.$md5url)){
+	$nu = filemtime('findercache/'.$md5url);
+	if(microtime(true)-$nu<10000){
+		$resultobject = json_decode(file_get_contents('findercache/'.$md5url));
+	}
+}
+
+else{
+  // Run search:
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $resultstring = curl_exec($ch);
+  curl_close($ch);
+  
+   //remove specialChars and make object:
+	$resultstring = str_replace('"#','"',$resultstring);
+	$resultstring = str_replace('"@','"',$resultstring);
+	$resultobject = json_decode(utf8_encode($resultstring));
+  	file_put_contents('findercache/'.$md5url, json_encode($resultobject));
+}
+
+if(isset($_GET['debugg'])){
+  print 'Tidtabellsdata: ';
+  print_r($resultobject);
+}
+
+return $resultobject;
+}
 ?>
