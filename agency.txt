@@ -57,3 +57,8 @@ agency_id,agency_name,agency_url,agency_timezone,agency_lang
 806,Nordlandsbussen,http://resrobot.se,Europe/Stockholm,sv
 807,IKEA,http://resrobot.se,Europe/Stockholm,sv
 809,Nilsbuss,http://resrobot.se,Europe/Stockholm,sv
+812,MTR Express,http://www.mtrexpress.se/,Europe/Stockholm,sv
+815,Travelshop,http://resrobot.se,Europe/Stockholm,sv
+821,Söne Buss,http://resrobot.se,Europe/Stockholm,sv
+822,Trossöbuss AB,http://resrobot.se,Europe/Stockholm,sv
+825,Shuttlebuss,http://resrobot.se,Europe/Stockholm,sv

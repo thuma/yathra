@@ -34,7 +34,11 @@ else{
 
 // Check if in cache:
 asort($_GET);
-$cachefile = md5(json_encode($_GET));
+foreach($_GET as $key => $value)
+	{ 
+	$cachefile = $cachefile.str_replace('-','',str_replace(':','',$value));
+	}
+
 @mkdir('findercache');
 if(file_exists('findercache/'.$cachefile)){
 	$nu = filemtime('findercache/'.$cachefile);
@@ -62,6 +66,10 @@ $resultobject = gettimetable($_GET['departureDate']);
 // Chek all trips
 $found = false;
 $numberfound = false;
+
+if(is_array($resultobject->timetableresult->ttitem) == FALSE){
+ $resultobject->timetableresult->ttitem = array($resultobject->timetableresult->ttitem);
+} 
 foreach($resultobject->timetableresult->ttitem as &$trip){
 	if(is_array($trip->segment) == false){
   	  $trip->segment = array($trip->segment);
@@ -82,8 +90,9 @@ foreach($resultobject->timetableresult->ttitem as &$trip){
   	}
 }
 
+
 if($found == false){
-  die('{"error":"No trips found in time interval"}');
+  die('{"error":"No more trips found in time interval"}');
 }
 if($numberfound == false){
   $_GET['departureTime'] = substr($sista->departure->datetime,11);
@@ -118,7 +127,10 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 	// Generate travel time;
 	$duration = strtotime($trip->segment[$last]->arrival->datetime) - strtotime($trip->segment[0]->departure->datetime);
 	$trip->traveltimetotal = date("H:i",$duration-3600);
-	$trip->segment[0]->segmentid->carrier->name = $agencylist[$trip->segment[0]->segmentid->carrier->id];
+	
+	foreach($trip->segment as $segment){
+		$segment->segmentid->carrier->name = $agencylist[$segment->segmentid->carrier->id];
+	}
 	
 	$first = 0;
 	if($trip->segment[0]->segmentid->mot->type == "G"){
@@ -160,26 +172,27 @@ foreach($outobject->timetableresult->ttitem as &$trip){
 $outobject->totaltimeafterurls = microtime(true) - $start;
 
 //Sellers; print $urlstring;
-$sellers["NSB"][0] 		= "http://api.yathra.se:8800/nsb/?";
-$sellers["VT"][0] 		= "http://api.yathra.se:8800/vt/?";
-$sellers["AEX"][0] 		= "http://api.yathra.se:8800/at/?";
-$sellers["TIB"][0] 		= "http://api.yathra.se:8800/tib/?";
-$sellers["OT"][0] 		= "http://api.yathra.se:8800/ot/?";
-$sellers["SKTR"][0] 		= "http://api.yathra.se:8800/sktr/?";
-$sellers["NETTBUSS"][0]		= "http://api.yathra.se:8800/nettbuss/?";
-$sellers["SJ"][0] 		= "http://api.yathra.se:8800/sj/?";
-$sellers["HLT"][0] 		= "http://api.yathra.se:8800/hlt/?";
-$sellers["SWEBUS"][0] 		= "http://api.yathra.se:8800/swebus/?";
-$sellers["BT"][0]		= "http://api.yathra.se:8800/bt/?";
-$sellers["Snt"][0] 		= "http://api.yathra.se:8800/snalltaget/?";
-$sellers["JLT"][0] 		= "http://api.yathra.se:8800/jlt/?";
-$sellers["DTR"][0] 		= "http://api.yathra.se:8800/dtr/?";
-$sellers["LTK"][0] 		= "http://api.yathra.se:8800/ltk/?";
-$sellers["BTR"][0] 		= "http://api.yathra.se:8800/btr/?";
-$sellers["XTR"][0] 		= "http://api.yathra.se:8800/xtr/?";
-$sellers["KLT"][0] 		= "http://api.yathra.se:8800/klt/?";
-$sellers["MAS"][0] 		= "http://api.yathra.se:8800/mas/?";
-$sellers["SL"][0] 		= "http://api1.yathra.se/prisAPI/sl.php?";
+$sellers["NSB"][0] 		= "http://api.yathra.se/nsb/?";
+$sellers["VT"][0] 		= "http://api.yathra.se/vt/?";
+$sellers["AEX"][0] 		= "http://api.yathra.se/at/?";
+$sellers["TIB"][0] 		= "http://api.yathra.se/tib/?";
+$sellers["OT"][0] 		= "http://api.yathra.se/ot/?";
+$sellers["SKTR"][0] 		= "http://api.yathra.se/sktr/?";
+$sellers["NETTBUSS"][0]		= "http://api.yathra.se/nettbuss/?";
+$sellers["SJ"][0] 		= "http://api.yathra.se/sj/?";
+$sellers["HLT"][0] 		= "http://api.yathra.se/hlt/?";
+$sellers["SWEBUS"][0] 		= "http://api.yathra.se/swebus/?";
+$sellers["BT"][0]		= "http://api.yathra.se/bt/?";
+$sellers["Snt"][0] 		= "http://api.yathra.se/snalltaget/?";
+$sellers["JLT"][0] 		= "http://api.yathra.se/jlt/?";
+$sellers["DTR"][0] 		= "http://api.yathra.se/dtr/?";
+$sellers["LTK"][0] 		= "http://api.yathra.se/ltk/?";
+$sellers["BTR"][0] 		= "http://api.yathra.se/btr/?";
+$sellers["XTR"][0] 		= "http://api.yathra.se/xtr/?";
+$sellers["KLT"][0] 		= "http://api.yathra.se/klt/?";
+$sellers["MAS"][0] 		= "http://api.yathra.se/mas/?";
+$sellers["SL"][0] 		= "http://api.yathra.se/sl/?";
+$sellers["MTR"][0] 		= "http://pi.thure.org/mtr.php?";
 
 //create the multiple cURL handle
 $curlmultihande = curl_multi_init();
@@ -340,7 +353,7 @@ $url = 'https://api.trafiklab.se/samtrafiken/resrobot/Search.json'.
   '&searchType=F'.
   '&arrival=false'.
   '&key='.file_get_contents('../resrobot.key');
-$md5url = md5($url);
+$md5url = $_GET['from'].$_GET['to'].str_replace('-','',$_GET['departureDate']).str_replace(':','',$_GET['departureTime']);
 
 /*
 &searchType
@@ -374,7 +387,7 @@ else{
    //remove specialChars and make object:
 	$resultstring = str_replace('"#','"',$resultstring);
 	$resultstring = str_replace('"@','"',$resultstring);
-	$resultobject = json_decode(utf8_encode($resultstring));
+	$resultobject = json_decode(utf8_encode(utf8_decode($resultstring)));
   	file_put_contents('findercache/'.$md5url, json_encode($resultobject));
 }
 

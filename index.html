@@ -160,6 +160,7 @@
 												<a href="http://www.klt.se/">Kalmar Länstrafik</a>,
 												<a href="http://www.lanstrafikenkron.se/">Länstrafiken Kronoberg</a>,
 												<a href="http://www.masexpressen.se">MasExpressen</a>,
+												<a href="http://www.mtrexpress.se">MTR Express</a>,
 												<a href="http://www.nettbuss.se">nettbuss</a>, 
 												<a href="http://www.nsb.no">NSB</a>,
 												<a href="http://www.sj.se">SJ</a>,
@@ -254,6 +255,10 @@
 			startDeparture = trip.segment[0].departure.datetime;
 			endarrival = trip.segment[trip.segment.length-1].arrival.datetime;
 			lastSegment = trip.segment[trip.segment.length-1];
+			
+			if(firstSegment.lowestprice == "13371337"){
+				firstSegment.lowestprice = "-";
+			}
 		
 			if(byten > 0 ){
 			priceone = firstSegment.lowestpriceseller.name +':'+ firstSegment.lowestprice +' SEK';
@@ -266,6 +271,10 @@
 			carrier = new Object();
 			carrier.name =  "Gå";
 			firstSegment.segmentid.carrier = carrier;}
+			
+			if(trip.price == "13371337"){
+				trip.price = "-";
+			}
 			
 			var stations = '<div class="row"><div class="large-12 columns text-center"><h2>Reseinformation</h2></div></div>\
 			<div class="row">\
@@ -313,10 +322,15 @@
 			{
 			if(trip.segment[i].segmentid.mot.type == "G")
 			{
-			carrier = new Object();
-			carrier.name =  "Gå";
-			trip.segment[i].segmentid.carrier = carrier;
+				carrier = new Object();
+				carrier.name =  "Du";
+				carrier.number =  "-"
+				trip.segment[i].segmentid.carrier = carrier;
 			}
+			if(trip.segment[i].lowestprice == "13371337"){
+				trip.segment[i].lowestprice = "-";
+			}
+			 
 			
 			stations = stations + '<div class="row">\
 			<div class="large-2 columns startStation">\
@@ -326,10 +340,10 @@
 			 '+trip.segment[i].departure.datetime.substring(11)+'\
 			</div>\
 			<div class="large-2 columns product">\
-			'+ trip.segment[i].segmentid.carrier.name +'\
+			'+ trip.segment[i].segmentid.carrier.name +', '+trip.segment[i].segmentid.mot.text+', '+trip.segment[i].segmentid.carrier.number+'\
 			</div>\
 			<div class="large-2 columns price">\
-			<a href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +':'+ trip.segment[i].lowestprice +' SEK</a>\
+			<a href="'+trip.segment[i].lowestpriceseller.url +'" target="_blank">'+ trip.segment[i].lowestpriceseller.name +' '+ trip.segment[i].lowestprice +'&nbsp;SEK</a>\
 			</div>	\
 			<div class="large-2 columns arrival">\
 			 '+trip.segment[i].arrival.datetime.substring(11)+' \
@@ -344,6 +358,10 @@
 			
 			var modalid = 'myModalID'+Math.random();
 			modalid = modalid.replace('.','');
+	
+	if(trip.price=="13371337"){
+		trip.price=="-";
+	}
 	$('#table_id').DataTable().row.add( [
             fromString ,
             startDeparture,
@@ -387,8 +405,13 @@
 				}
 				}
 				catch(e){
+				  try{
 				  CreateTrip(tripData.timetableresult.ttitem[0],0);
 				  $("#searchbutton").click();
+				  }
+				  catch(e){
+				  	window.alert('Tekniskt Fel, kontakta info@yathra.se');
+				  }
 				}
 				
 
